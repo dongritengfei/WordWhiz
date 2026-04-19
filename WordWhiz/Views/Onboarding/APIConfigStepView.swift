@@ -3,8 +3,6 @@ import SwiftUI
 struct APIConfigStepView: View {
     @Environment(OnboardingViewModel.self) var onboardingVM
     @Environment(SettingsViewModel.self) var settingsVM
-    @State private var isTesting = false
-    @State private var testResult: SettingsViewModel.ConnectionTestResult?
 
     var body: some View {
         @Bindable var settingsVM = settingsVM
@@ -39,7 +37,6 @@ struct APIConfigStepView: View {
                     }
                     .onChange(of: settingsVM.llmProvider) {
                         settingsVM.loadAPIKeyForCurrentProvider()
-                        testResult = nil
                     }
                 }
 

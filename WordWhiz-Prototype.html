@@ -240,7 +240,7 @@
 
   /* Main Panel */
   .main-panel {
-    width: 400px;
+    width: 480px;
     background: var(--bg-panel);
     border: 1px solid var(--border);
     border-radius: 12px;
@@ -345,7 +345,7 @@
   }
   .result-textarea {
     flex: 1;
-    min-height: 140px;
+    min-height: 200px;
     background: var(--bg-secondary);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -794,29 +794,22 @@
           <span>📋 打开优化面板</span>
           <span class="shortcut">⌃ Z</span>
         </div>
+        <div class="dropdown-item">
+          <span>🧪 测试面板（示例文本）</span>
+        </div>
         <div class="dropdown-divider"></div>
         <div class="dropdown-item">
           <span style="display:flex;align-items:center;gap:8px;">
             <span class="status-dot"></span> 服务已就绪
           </span>
         </div>
-        <div class="dropdown-item">
-          <span>📝 最近优化记录</span>
-          <span style="color:var(--text-muted);font-size:12px;">3</span>
-        </div>
         <div class="dropdown-divider"></div>
         <div class="dropdown-item">
           <span>🔧 偏好设置...</span>
-          <span class="shortcut">⌘ ⇧ ,</span>
-        </div>
-        <div class="dropdown-item">
-          <span>当前指令: 润色</span>
-          <span style="font-size:12px;color:var(--accent);">切换 ▸</span>
         </div>
         <div class="dropdown-divider"></div>
         <div class="dropdown-item">
-          <span>启用全局快捷键</span>
-          <div class="dropdown-toggle on"></div>
+          <span>✓ 全局快捷键已启用</span>
         </div>
         <div class="dropdown-divider"></div>
         <div class="dropdown-item" style="color:var(--text-muted);">
@@ -837,7 +830,7 @@
   <div class="scene-menubar" style="min-height:auto;padding-bottom:20px;">
     <div class="scene-title">优化面板</div>
     <div class="scene-desc">
-      选中文本后按 <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">⌃ Z</kbd> 触发优化，结果显示在独立面板中，支持编辑和复制。
+      选中文本后按 <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">⌘ C</kbd> 复制，再按 <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">⌃ Z</kbd> 触发优化，结果显示在独立面板中，支持编辑和复制。
     </div>
   </div>
   <div class="panel-container">
@@ -861,7 +854,7 @@
           另外数据埋点方案也需要在下周确定下来。
         </p>
         <div class="shortcut-hint">
-          选中文本 <span class="arrow">→</span> 按下 <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">⌃ Z</kbd> <span class="arrow">→</span> 面板响应
+          选中文本 <span class="arrow">→</span> <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">⌘ C</kbd> <span class="arrow">→</span> 按下 <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">⌃ Z</kbd> <span class="arrow">→</span> 面板响应
         </div>
       </div>
     </div>
@@ -874,10 +867,9 @@
           WordWhiz
         </div>
         <div class="panel-header-actions">
-          <button class="panel-btn-icon" title="对比视图" onclick="toggleDiffView()">⇋</button>
-          <button class="panel-btn-icon" title="历史记录">🕘</button>
+          <button class="panel-btn-icon" title="停止生成" style="color:var(--red);display:none;" id="header-stop-btn">■</button>
           <button class="panel-btn-icon" title="设置">⚙</button>
-          <button class="panel-btn-icon" title="固定窗口">📌</button>
+          <button class="panel-btn-icon" title="固定窗口" id="header-pin-btn">📌</button>
         </div>
       </div>
 
@@ -923,7 +915,6 @@
       <div class="action-bar">
         <div class="action-bar-left">
           <button class="btn btn-ghost" onclick="regenerate()" title="重新生成">🔄</button>
-          <button class="btn btn-ghost" onclick="toggleDiffView()" title="对比视图">⇋</button>
         </div>
         <div class="action-bar-right">
           <button class="btn btn-secondary">全选文本</button>
@@ -1014,7 +1005,7 @@
             <span class="nav-icon">⚙️</span> 通用
           </button>
           <button class="settings-nav-item" onclick="showSettingsTab('api', this)">
-            <span class="nav-icon">🔑</span> API 配置
+            <span class="nav-icon">🔑</span> 模型配置
           </button>
           <button class="settings-nav-item" onclick="showSettingsTab('prompts', this)">
             <span class="nav-icon">📝</span> 自定义指令
@@ -1091,7 +1082,7 @@
 
           <!-- API Tab -->
           <div class="settings-tabs" id="tab-api">
-            <div class="settings-section-title">API 配置</div>
+            <div class="settings-section-title">模型配置</div>
             <div class="setting-group">
               <div class="setting-label">LLM 服务商</div>
               <select class="setting-select">
@@ -1319,8 +1310,8 @@
       <div class="flow-step">
         <div class="flow-step-num">2</div>
         <div class="flow-step-content">
-          <div class="flow-step-title">按下快捷键 ⌃ Z</div>
-          <div class="flow-step-desc">WordWhiz 通过 macOS Accessibility API 获取选中文本，自动发送给 LLM 进行优化</div>
+          <div class="flow-step-title">复制文本并按下 ⌃ Z</div>
+          <div class="flow-step-desc">先按 ⌘ C 复制选中文本到剪贴板，再按 ⌃ Z，WordWhiz 自动读取剪贴板内容发送给 LLM 进行优化</div>
         </div>
       </div>
       <div class="flow-arrow">↓</div>

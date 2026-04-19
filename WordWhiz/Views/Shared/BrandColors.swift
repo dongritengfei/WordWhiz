@@ -23,7 +23,6 @@ enum BrandColors {
     static let green = Color(hex: "4CD964")
     static let orange = Color(hex: "FF9500")
     static let red = Color(hex: "FF3B30")
-    static let yellow = Color(hex: "FFCC00")
 }
 
 // MARK: - Color Extension

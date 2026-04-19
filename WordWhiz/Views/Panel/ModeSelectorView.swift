@@ -42,7 +42,7 @@ struct ModeTabButton: View {
                 .background(isSelected ? BrandColors.accent : Color.clear)
                 .cornerRadius(6)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.borderless)
         .contentShape(Rectangle())
     }
 }

@@ -14,10 +14,10 @@ struct ActionBarView: View {
                     Image(systemName: "arrow.clockwise")
                         .font(.system(size: 14))
                         .foregroundColor(BrandColors.textSecondary)
-                        .frame(width: 28, height: 28)
+                        .frame(width: 32, height: 32)
+                        .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
-                .contentShape(Rectangle())
+                .buttonStyle(.borderless)
                 .disabled(viewModel.streamingStatus.isStreaming)
             }
 

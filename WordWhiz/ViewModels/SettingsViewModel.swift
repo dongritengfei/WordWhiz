@@ -174,7 +174,7 @@ enum SettingsTab: String, CaseIterable {
     var displayName: String {
         switch self {
         case .general: return "通用"
-        case .api: return "API 配置"
+        case .api: return "模型配置"
         case .prompts: return "自定义指令"
         case .history: return "历史记录"
         case .shortcuts: return "快捷键"

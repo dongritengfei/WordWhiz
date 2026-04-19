@@ -5,8 +5,6 @@ import SwiftUI
 final class OnboardingViewModel {
     var currentStep: Int = 0
     var isAccessibilityGranted: Bool = false
-    var isAPIConfigured: Bool = false
-    var isConnectionTested: Bool = false
 
     let totalSteps = 3
 

@@ -5,8 +5,6 @@ import Foundation
 final class LLMService {
     static let shared = LLMService()
 
-    private var currentTask: Task<Void, Never>?
-
     private init() {}
 
     func createProvider(config: LLMProviderConfig, apiKey: String, baseURL: String?, modelName: String?) -> LLMProviderProtocol? {
@@ -50,10 +48,5 @@ final class LLMService {
         userPrompt: String
     ) -> AsyncThrowingStream<String, Error> {
         return provider.streamOptimize(systemPrompt: systemPrompt, userPrompt: userPrompt)
-    }
-
-    func cancelCurrentTask() {
-        currentTask?.cancel()
-        currentTask = nil
     }
 }

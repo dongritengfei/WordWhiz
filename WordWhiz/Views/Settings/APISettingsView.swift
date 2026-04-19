@@ -7,7 +7,7 @@ struct APISettingsView: View {
         @Bindable var viewModel = viewModel
 
         VStack(alignment: .leading, spacing: 0) {
-            Text("API 配置")
+            Text("模型配置")
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(BrandColors.textPrimary)
                 .padding(.bottom, 20)

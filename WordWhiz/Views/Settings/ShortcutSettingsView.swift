@@ -1,5 +1,4 @@
 import SwiftUI
-import AppKit
 
 struct ShortcutSettingsView: View {
     @Environment(SettingsViewModel.self) var settingsViewModel

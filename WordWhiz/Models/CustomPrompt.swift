@@ -19,10 +19,6 @@ final class CustomPrompt {
         self.sortOrder = sortOrder
     }
 
-    var userPrompt: String {
-        return promptTemplate.replacingOccurrences(of: "{{text}}", with: "")
-    }
-
     var preview: String {
         let lines = promptTemplate.components(separatedBy: .newlines)
         return lines.joined(separator: " ")
