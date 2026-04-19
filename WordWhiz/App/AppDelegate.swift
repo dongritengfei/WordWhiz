@@ -111,7 +111,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func handleHotkeyPressed(frontmostAppPID: pid_t?, capturedText: String?) {
-        NSLog("[WordWhiz] handleHotkeyPressed called with capturedText: \(capturedText?.prefix(30) ?? "nil")")
+        // 不记录实际文本内容，只记录长度，保护用户隐私
+        let textLength = capturedText?.count ?? 0
+        NSLog("[WordWhiz] handleHotkeyPressed called with capturedText length: \(textLength)")
         
         // Use capturedText from clipboard, or show error if empty
         guard let text = capturedText, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
