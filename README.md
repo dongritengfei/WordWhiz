@@ -26,7 +26,7 @@
 ### 从源码构建
 
 ```bash
-git clone https://github.com/yourusername/WordWhiz.git
+git clone https://github.com/dongritengfei/WordWhiz.git
 cd WordWhiz
 xcodebuild -project WordWhiz.xcodeproj -scheme WordWhiz -configuration Release build
 ```

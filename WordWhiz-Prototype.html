@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WordWhiz - macOS App 交互原型</title>
+<style>
+  :root {
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #2a2a2a;
+    --bg-tertiary: #333333;
+    --bg-panel: #252525;
+    --text-primary: #e8e8e8;
+    --text-secondary: #999;
+    --text-muted: #666;
+    --accent: #5B7FFF;
+    --accent-hover: #7B9AFF;
+    --accent-dim: rgba(91,127,255,0.15);
+    --border: #3a3a3a;
+    --green: #4CD964;
+    --orange: #FF9500;
+    --red: #FF3B30;
+    --yellow: #FFCC00;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    background: #111;
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== Navigation ===== */
+  .nav-bar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 52px;
+    background: rgba(30,30,30,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+    gap: 8px;
+  }
+  .nav-bar .nav-title {
+    font-size: 13px; font-weight: 600; color: var(--text-secondary);
+    letter-spacing: 1px; text-transform: uppercase;
+    margin-right: 20px;
+  }
+  .nav-tab {
+    padding: 6px 16px; border-radius: 6px;
+    font-size: 13px; color: var(--text-secondary);
+    cursor: pointer; transition: all 0.2s;
+    border: none; background: none;
+    font-family: inherit;
+  }
+  .nav-tab:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+  .nav-tab.active { color: #fff; background: var(--accent); }
+
+  /* ===== Scenes ===== */
+  .scene {
+    display: none;
+    padding-top: 52px;
+    min-height: 100vh;
+  }
+  .scene.active { display: block; }
+
+  /* ===== Scene 1: Menu Bar ===== */
+  .scene-menubar {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: calc(100vh - 52px);
+    padding: 40px 20px;
+  }
+  .scene-title {
+    font-size: 22px; font-weight: 600; margin-bottom: 8px;
+  }
+  .scene-desc {
+    font-size: 14px; color: var(--text-secondary); margin-bottom: 40px;
+    text-align: center; max-width: 480px; line-height: 1.6;
+  }
+
+  /* macOS Menu Bar simulation */
+  .macos-menubar {
+    width: 800px; height: 28px;
+    background: rgba(40,40,40,0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 0;
+    display: flex; align-items: center;
+    padding: 0 12px;
+    font-size: 13px; font-weight: 500;
+    gap: 16px;
+    position: relative;
+  }
+  .macos-menubar .apple-icon { font-size: 15px; }
+  .macos-menubar .menu-items { display: flex; gap: 16px; flex: 1; }
+  .macos-menubar .menu-item { color: var(--text-primary); font-size: 13px; font-weight: 500; }
+  .macos-menubar .tray-area {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 12px; color: var(--text-secondary);
+  }
+  .macos-menubar .politext-icon {
+    width: 18px; height: 18px;
+    background: var(--accent);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: #fff;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .politext-icon:hover { transform: scale(1.1); }
+
+  /* Menu Bar Dropdown */
+  .menubar-dropdown {
+    position: absolute;
+    top: 32px; right: 40px;
+    width: 280px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 8px;
+    display: none;
+    z-index: 100;
+  }
+  .menubar-dropdown.show { display: block; }
+  .dropdown-item {
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; cursor: pointer;
+    transition: background 0.15s;
+  }
+  .dropdown-item:hover { background: var(--bg-tertiary); }
+  .dropdown-item .shortcut {
+    font-size: 11px; color: var(--text-muted);
+    font-family: 'SF Mono', monospace;
+  }
+  .dropdown-divider {
+    height: 1px; background: var(--border);
+    margin: 6px 0;
+  }
+  .dropdown-item .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--green);
+  }
+  .dropdown-toggle {
+    width: 32px; height: 18px;
+    border-radius: 9px;
+    background: var(--green);
+    position: relative;
+    cursor: pointer;
+  }
+  .dropdown-toggle::after {
+    content: '';
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    position: absolute;
+    top: 2px; right: 2px;
+    transition: all 0.2s;
+  }
+
+  .hint-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 30px;
+    padding: 10px 20px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(91,127,255,0.3);
+    border-radius: 8px;
+    font-size: 13px; color: var(--accent);
+  }
+  .hint-badge kbd {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    padding: 2px 8px; border-radius: 4px;
+    font-size: 12px; font-family: 'SF Mono', monospace;
+    color: var(--text-primary);
+  }
+
+  /* ===== Scene 2: Main Panel ===== */
+  .panel-container {
+    display: flex; justify-content: center;
+    padding: 60px 20px 40px;
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+
+  /* Simulated background app */
+  .bg-app {
+    width: 520px; height: 580px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .bg-app-titlebar {
+    height: 38px;
+    background: var(--bg-tertiary);
+    display: flex; align-items: center;
+    padding: 0 14px;
+    gap: 8px;
+  }
+  .traffic-light { width: 12px; height: 12px; border-radius: 50%; }
+  .tl-red { background: var(--red); }
+  .tl-yellow { background: var(--yellow); }
+  .tl-green { background: var(--green); }
+  .bg-app-titlebar .title {
+    flex: 1; text-align: center;
+    font-size: 12px; color: var(--text-secondary);
+    margin-right: 50px;
+  }
+  .bg-app-content {
+    padding: 20px;
+    font-size: 14px; line-height: 1.8;
+    color: var(--text-secondary);
+  }
+  .bg-app-content .selected-text {
+    background: rgba(91,127,255,0.25);
+    color: var(--text-primary);
+    border-radius: 3px;
+    padding: 1px 0;
+  }
+  .shortcut-hint {
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 20px; gap: 8px;
+    font-size: 13px; color: var(--text-muted);
+  }
+  .shortcut-hint .arrow { font-size: 20px; color: var(--accent); animation: pulseArrow 1.5s infinite; }
+  @keyframes pulseArrow {
+    0%,100% { opacity: 0.4; transform: translateX(0); }
+    50% { opacity: 1; transform: translateX(4px); }
+  }
+
+  /* Main Panel */
+  .main-panel {
+    width: 400px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex; flex-direction: column;
+  }
+  .panel-header {
+    padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-header .panel-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 600;
+  }
+  .panel-header .panel-logo .logo-icon {
+    width: 22px; height: 22px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+  .panel-header-actions {
+    display: flex; gap: 6px;
+  }
+  .panel-btn-icon {
+    width: 28px; height: 28px;
+    border: none; background: var(--bg-tertiary);
+    border-radius: 6px; cursor: pointer;
+    color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    transition: all 0.15s;
+  }
+  .panel-btn-icon:hover { background: var(--border); color: var(--text-primary); }
+
+  /* Mode Selector */
+  .mode-selector {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mode-tabs {
+    display: flex; gap: 4px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  .mode-tab {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    font-family: inherit;
+  }
+  .mode-tab:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+  .mode-tab.active { color: #fff; background: var(--accent); }
+
+  /* Source Text */
+  .source-section {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-label {
+    font-size: 11px; font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-label .collapse-btn {
+    font-size: 12px; color: var(--text-muted);
+    cursor: pointer; background: none; border: none;
+    font-family: inherit;
+  }
+  .source-text {
+    font-size: 13px; line-height: 1.6;
+    color: var(--text-secondary);
+    max-height: 80px;
+    overflow: hidden;
+    position: relative;
+  }
+  .source-text.collapsed { max-height: 36px; }
+  .source-text::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 24px;
+    background: linear-gradient(transparent, var(--bg-panel));
+  }
+
+  /* Result Section */
+  .result-section {
+    padding: 12px 18px;
+    flex: 1;
+    display: flex; flex-direction: column;
+  }
+  .result-textarea {
+    flex: 1;
+    min-height: 140px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px; line-height: 1.7;
+    color: var(--text-primary);
+    resize: none;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .result-textarea:focus { border-color: var(--accent); }
+  .result-textarea::placeholder { color: var(--text-muted); }
+
+  /* Diff highlight */
+  .diff-view {
+    min-height: 140px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px; line-height: 1.7;
+    color: var(--text-primary);
+  }
+  .diff-add { color: var(--green); background: rgba(76,217,100,0.1); border-radius: 3px; padding: 0 2px; }
+  .diff-del { color: var(--red); text-decoration: line-through; opacity: 0.6; }
+
+  /* Action Bar */
+  .action-bar {
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px;
+  }
+  .action-bar-left { display: flex; gap: 6px; align-items: center; }
+  .action-bar-right { display: flex; gap: 8px; }
+  .btn {
+    padding: 7px 16px; border-radius: 6px;
+    font-size: 13px; cursor: pointer;
+    border: none; font-family: inherit;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-secondary { background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--border); }
+  .btn-ghost { background: none; color: var(--text-secondary); }
+  .btn-ghost:hover { color: var(--text-primary); }
+  .char-count { font-size: 11px; color: var(--text-muted); }
+
+  /* ===== Scene 3: Loading State ===== */
+  .loading-container {
+    display: flex; justify-content: center;
+    padding: 60px 20px 40px;
+  }
+  .loading-panel {
+    width: 400px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .streaming-text {
+    font-size: 14px; line-height: 1.7;
+    color: var(--text-primary);
+  }
+  .streaming-cursor {
+    display: inline-block;
+    width: 2px; height: 16px;
+    background: var(--accent);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blink 0.8s infinite;
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+  .streaming-skeleton {
+    height: 14px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--border) 50%, var(--bg-tertiary) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: 10px;
+  }
+  .streaming-skeleton:last-child { width: 60%; }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ===== Scene 4: Settings ===== */
+  .settings-container {
+    display: flex; justify-content: center;
+    padding: 60px 20px 40px;
+  }
+  .settings-window {
+    width: 640px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .settings-titlebar {
+    height: 44px;
+    background: var(--bg-tertiary);
+    display: flex; align-items: center;
+    padding: 0 16px;
+    gap: 8px;
+  }
+  .settings-titlebar .title {
+    flex: 1; text-align: center;
+    font-size: 13px; font-weight: 600;
+    margin-right: 50px;
+  }
+  .settings-body {
+    display: flex; height: 480px;
+  }
+  .settings-sidebar {
+    width: 170px;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border);
+    padding: 12px 8px;
+  }
+  .settings-nav-item {
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+  }
+  .settings-nav-item:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+  .settings-nav-item.active { color: #fff; background: var(--accent); }
+  .settings-nav-item .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+
+  .settings-content {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+  }
+  .settings-section-title {
+    font-size: 16px; font-weight: 600;
+    margin-bottom: 20px;
+  }
+  .setting-group {
+    margin-bottom: 20px;
+  }
+  .setting-label {
+    font-size: 13px; font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+  }
+  .setting-desc {
+    font-size: 11px; color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .setting-input {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 13px;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .setting-input:focus { border-color: var(--accent); }
+  .setting-select {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 13px;
+    outline: none;
+    -webkit-appearance: none;
+    font-family: inherit;
+  }
+  .setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .setting-row:last-child { border-bottom: none; }
+  .toggle-switch {
+    width: 38px; height: 22px;
+    border-radius: 11px;
+    background: var(--bg-tertiary);
+    position: relative;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+  }
+  .toggle-switch.on {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .toggle-switch::after {
+    content: '';
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    position: absolute;
+    top: 1px; left: 1px;
+    transition: all 0.2s;
+  }
+  .toggle-switch.on::after { left: 17px; }
+
+  /* ===== Scene 5: Custom Prompts ===== */
+  .prompts-list {
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .prompt-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .prompt-card:hover { border-color: var(--accent); }
+  .prompt-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .prompt-card-name {
+    font-size: 14px; font-weight: 600;
+  }
+  .prompt-card-actions { display: flex; gap: 6px; }
+  .prompt-card-actions button {
+    background: none; border: none;
+    color: var(--text-muted); cursor: pointer;
+    font-size: 13px;
+    transition: color 0.15s;
+  }
+  .prompt-card-actions button:hover { color: var(--text-primary); }
+  .prompt-card-preview {
+    font-size: 12px; color: var(--text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .add-prompt-btn {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: none;
+    width: 100%;
+    font-family: inherit;
+  }
+  .add-prompt-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ===== Scene 6: History ===== */
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .history-item:hover { border-color: var(--accent); }
+  .history-item-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .history-item-mode {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .history-item-time {
+    font-size: 11px; color: var(--text-muted);
+  }
+  .history-item-text {
+    font-size: 13px; color: var(--text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+  }
+
+  /* ===== Flow Diagram ===== */
+  .flow-container {
+    display: flex; justify-content: center;
+    padding: 60px 20px 40px;
+  }
+  .flow-diagram {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 16px;
+    max-width: 600px;
+    width: 100%;
+  }
+  .flow-step {
+    width: 100%;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 22px;
+    display: flex; align-items: center; gap: 14px;
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .flow-step:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .flow-step-num {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .flow-step-content { flex: 1; }
+  .flow-step-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .flow-step-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+  .flow-arrow {
+    font-size: 18px; color: var(--text-muted);
+  }
+  .flow-branch {
+    display: flex; gap: 16px; width: 100%;
+  }
+  .flow-branch .flow-step { flex: 1; }
+
+  /* ===== Active states ===== */
+  .settings-tabs { display: none; }
+  .settings-tabs.active { display: block; }
+
+  /* ===== Annotation ===== */
+  .annotation {
+    position: absolute;
+    font-size: 11px;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid rgba(91,127,255,0.3);
+    padding: 4px 10px;
+    border-radius: 4px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* Responsive */
+  @media (max-width: 960px) {
+    .panel-container { flex-direction: column; align-items: center; }
+    .bg-app { width: 100%; max-width: 520px; }
+    .main-panel { width: 100%; max-width: 400px; }
+  }
+
+  /* page labels */
+  .page-label {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    z-index: 999;
+  }
+  .page-label kbd {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-family: 'SF Mono', monospace;
+  }
+
+  /* Streaming animation for scene3 */
+  .stream-word {
+    opacity: 0;
+    animation: fadeInWord 0.3s forwards;
+  }
+  @keyframes fadeInWord {
+    from { opacity: 0; transform: translateY(2px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <span class="nav-title">WordWhiz 原型</span>
+  <button class="nav-tab active" onclick="showScene('menubar')">菜单栏</button>
+  <button class="nav-tab" onclick="showScene('panel')">优化面板</button>
+  <button class="nav-tab" onclick="showScene('loading')">加载状态</button>
+  <button class="nav-tab" onclick="showScene('settings')">设置</button>
+  <button class="nav-tab" onclick="showScene('flow')">使用流程</button>
+</div>
+
+<!-- ===== Scene 1: Menu Bar ===== -->
+<div class="scene active" id="scene-menubar">
+  <div class="scene-menubar">
+    <div class="scene-title">菜单栏常驻</div>
+    <div class="scene-desc">
+      WordWhiz 常驻在 macOS 菜单栏，不占用 Dock 位置。<br>
+      点击图标可快速访问常用功能和历史记录。
+    </div>
+
+    <div style="position: relative;">
+      <div class="macos-menubar">
+        <span class="apple-icon"></span>
+        <div class="menu-items">
+          <span class="menu-item">访达</span>
+          <span class="menu-item">文件</span>
+          <span class="menu-item">编辑</span>
+          <span class="menu-item">显示</span>
+        </div>
+        <div class="tray-area">
+          <span>☁️</span>
+          <span>🔋</span>
+          <span>16:30</span>
+          <div class="politext-icon" onclick="toggleDropdown()" id="politext-tray">Ww</div>
+        </div>
+      </div>
+
+      <div class="menubar-dropdown" id="menubar-dropdown">
+        <div class="dropdown-item">
+          <span>📋 打开优化面板</span>
+          <span class="shortcut">⌃ Z</span>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item">
+          <span style="display:flex;align-items:center;gap:8px;">
+            <span class="status-dot"></span> 服务已就绪
+          </span>
+        </div>
+        <div class="dropdown-item">
+          <span>📝 最近优化记录</span>
+          <span style="color:var(--text-muted);font-size:12px;">3</span>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item">
+          <span>🔧 偏好设置...</span>
+          <span class="shortcut">⌘ ⇧ ,</span>
+        </div>
+        <div class="dropdown-item">
+          <span>当前指令: 润色</span>
+          <span style="font-size:12px;color:var(--accent);">切换 ▸</span>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item">
+          <span>启用全局快捷键</span>
+          <div class="dropdown-toggle on"></div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item" style="color:var(--text-muted);">
+          <span>退出 WordWhiz</span>
+          <span class="shortcut">⌘ Q</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hint-badge">
+      💡 点击菜单栏中的 <kbd>Ww</kbd> 图标查看下拉菜单
+    </div>
+  </div>
+</div>
+
+<!-- ===== Scene 2: Main Panel ===== -->
+<div class="scene" id="scene-panel">
+  <div class="scene-menubar" style="min-height:auto;padding-bottom:20px;">
+    <div class="scene-title">优化面板</div>
+    <div class="scene-desc">
+      选中文本后按 <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">⌃ Z</kbd> 触发优化，结果显示在独立面板中，支持编辑和复制。
+    </div>
+  </div>
+  <div class="panel-container">
+    <!-- Simulated Background App -->
+    <div class="bg-app">
+      <div class="bg-app-titlebar">
+        <div class="traffic-light tl-red"></div>
+        <div class="traffic-light tl-yellow"></div>
+        <div class="traffic-light tl-green"></div>
+        <span class="title">备忘录</span>
+      </div>
+      <div class="bg-app-content">
+        <p style="margin-bottom:16px;color:var(--text-muted);font-size:13px;">📝 产品周报 - 2026年第16周</p>
+        <p style="margin-bottom:12px;">
+          本周我们主要完成了以下工作：<span class="selected-text">首先我们把用户反馈的那个登录bug给修复了，然后还做了一下性能优化，页面加载速度快了不少，另外还跟设计师对了下新版首页的方案，大体上没啥问题，就是有些细节还需要再调调。</span>
+        </p>
+        <p style="margin-bottom:12px;">
+          下周计划继续推进首页改版的开发工作，预计周三可以完成前端部分的编码。
+        </p>
+        <p>
+          另外数据埋点方案也需要在下周确定下来。
+        </p>
+        <div class="shortcut-hint">
+          选中文本 <span class="arrow">→</span> 按下 <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">⌃ Z</kbd> <span class="arrow">→</span> 面板响应
+        </div>
+      </div>
+    </div>
+
+    <!-- Optimization Panel -->
+    <div class="main-panel">
+      <div class="panel-header">
+        <div class="panel-logo">
+          <div class="logo-icon">Ww</div>
+          WordWhiz
+        </div>
+        <div class="panel-header-actions">
+          <button class="panel-btn-icon" title="对比视图" onclick="toggleDiffView()">⇋</button>
+          <button class="panel-btn-icon" title="历史记录">🕘</button>
+          <button class="panel-btn-icon" title="设置">⚙</button>
+          <button class="panel-btn-icon" title="固定窗口">📌</button>
+        </div>
+      </div>
+
+      <div class="mode-selector">
+        <div class="mode-tabs">
+          <button class="mode-tab active" onclick="selectMode(this)">✨ 润色</button>
+          <button class="mode-tab" onclick="selectMode(this)">🌍 翻译</button>
+          <button class="mode-tab" onclick="selectMode(this)">📋 摘要</button>
+          <button class="mode-tab" onclick="selectMode(this)">📝 扩写</button>
+          <button class="mode-tab" onclick="selectMode(this)">👔 正式化</button>
+          <button class="mode-tab" onclick="selectMode(this)">💬 口语化</button>
+          <button class="mode-tab" onclick="selectMode(this)">🎯 自定义</button>
+        </div>
+      </div>
+
+      <div class="source-section">
+        <div class="section-label">
+          原文
+          <button class="collapse-btn" onclick="toggleSource()">收起 ▴</button>
+        </div>
+        <div class="source-text" id="source-text">
+          首先我们把用户反馈的那个登录bug给修复了，然后还做了一下性能优化，页面加载速度快了不少，另外还跟设计师对了下新版首页的方案，大体上没啥问题，就是有些细节还需要再调调。
+        </div>
+      </div>
+
+      <div class="result-section">
+        <div class="section-label" style="margin-bottom:8px;">
+          优化结果
+          <span class="char-count">89 字</span>
+        </div>
+        <div id="result-normal">
+          <textarea class="result-textarea" id="result-textarea">本周完成了三项重点工作：一是修复了用户反馈的登录异常问题；二是进行了页面性能优化，显著提升了加载速度；三是与设计团队完成了新版首页方案的初步评审，整体方向达成一致，后续将针对细节进行进一步打磨。</textarea>
+        </div>
+        <div id="result-diff" style="display:none;">
+          <div class="diff-view">
+            <span class="diff-del">首先我们把用户反馈的那个登录bug给修复了，然后还做了一下性能优化，页面加载速度快了不少，另外还跟设计师对了下新版首页的方案，大体上没啥问题，就是有些细节还需要再调调。</span>
+            <br><br>
+            <span class="diff-add">本周完成了三项重点工作：一是修复了用户反馈的登录异常问题；二是进行了页面性能优化，显著提升了加载速度；三是与设计团队完成了新版首页方案的初步评审，整体方向达成一致，后续将针对细节进行进一步打磨。</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <div class="action-bar-left">
+          <button class="btn btn-ghost" onclick="regenerate()" title="重新生成">🔄</button>
+          <button class="btn btn-ghost" onclick="toggleDiffView()" title="对比视图">⇋</button>
+        </div>
+        <div class="action-bar-right">
+          <button class="btn btn-secondary">全选文本</button>
+          <button class="btn btn-primary" onclick="copyResult()">📋 复制结果</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Scene 3: Loading State ===== -->
+<div class="scene" id="scene-loading">
+  <div class="scene-menubar" style="min-height:auto;padding-bottom:20px;">
+    <div class="scene-title">加载与流式输出</div>
+    <div class="scene-desc">
+      调用 LLM 时显示流式输出效果，让用户实时看到优化进度。<br>
+      点击下方按钮模拟加载过程。
+    </div>
+  </div>
+  <div class="loading-container">
+    <div class="loading-panel">
+      <div class="panel-header">
+        <div class="panel-logo">
+          <div class="logo-icon">Ww</div>
+          WordWhiz
+        </div>
+        <div class="panel-header-actions">
+          <button class="panel-btn-icon" title="停止生成" style="color:var(--red);" id="stop-btn" onclick="stopStreaming()">■</button>
+        </div>
+      </div>
+      <div class="mode-selector">
+        <div class="mode-tabs">
+          <button class="mode-tab active">✨ 润色</button>
+          <button class="mode-tab">🌍 翻译</button>
+          <button class="mode-tab">👔 正式化</button>
+        </div>
+      </div>
+      <div class="source-section">
+        <div class="section-label">原文 <button class="collapse-btn">收起 ▴</button></div>
+        <div class="source-text collapsed">
+          首先我们把用户反馈的那个登录bug给修复了...
+        </div>
+      </div>
+      <div class="result-section" style="min-height:200px;">
+        <div class="section-label" style="margin-bottom:8px;">
+          优化结果
+          <span style="font-size:11px;color:var(--accent);" id="stream-status">● 生成中...</span>
+        </div>
+        <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:12px;min-height:140px;">
+          <div id="streaming-output">
+            <div class="streaming-skeleton" style="width:100%"></div>
+            <div class="streaming-skeleton" style="width:90%"></div>
+            <div class="streaming-skeleton" style="width:70%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="action-bar">
+        <div></div>
+        <button class="btn btn-primary" style="opacity:0.5;" id="loading-copy-btn" disabled>📋 复制结果</button>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:20px;">
+    <button class="btn btn-primary" onclick="startStreaming()" id="start-stream-btn">▶ 模拟流式输出</button>
+    <button class="btn btn-secondary" onclick="resetStreaming()" style="margin-left:8px;">↻ 重置</button>
+  </div>
+</div>
+
+<!-- ===== Scene 4: Settings ===== -->
+<div class="scene" id="scene-settings">
+  <div class="scene-menubar" style="min-height:auto;padding-bottom:20px;">
+    <div class="scene-title">偏好设置</div>
+    <div class="scene-desc">
+      配置 API 密钥、自定义 Prompt 模板、管理历史记录等。
+    </div>
+  </div>
+  <div class="settings-container">
+    <div class="settings-window">
+      <div class="settings-titlebar">
+        <div class="traffic-light tl-red"></div>
+        <div class="traffic-light tl-yellow"></div>
+        <div class="traffic-light tl-green"></div>
+        <span class="title">WordWhiz 偏好设置</span>
+      </div>
+      <div class="settings-body">
+        <div class="settings-sidebar">
+          <button class="settings-nav-item active" onclick="showSettingsTab('general', this)">
+            <span class="nav-icon">⚙️</span> 通用
+          </button>
+          <button class="settings-nav-item" onclick="showSettingsTab('api', this)">
+            <span class="nav-icon">🔑</span> API 配置
+          </button>
+          <button class="settings-nav-item" onclick="showSettingsTab('prompts', this)">
+            <span class="nav-icon">📝</span> 自定义指令
+          </button>
+          <button class="settings-nav-item" onclick="showSettingsTab('history', this)">
+            <span class="nav-icon">🕘</span> 历史记录
+          </button>
+          <button class="settings-nav-item" onclick="showSettingsTab('shortcuts', this)">
+            <span class="nav-icon">⌨️</span> 快捷键
+          </button>
+          <button class="settings-nav-item" onclick="showSettingsTab('about', this)">
+            <span class="nav-icon">ℹ️</span> 关于
+          </button>
+        </div>
+        <div class="settings-content">
+          <!-- General Tab -->
+          <div class="settings-tabs active" id="tab-general">
+            <div class="settings-section-title">通用设置</div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">开机自启动</div>
+                <div class="setting-desc">登录时自动启动 WordWhiz</div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">显示 Dock 图标</div>
+                <div class="setting-desc">在 Dock 中显示应用图标</div>
+              </div>
+              <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">优化后自动复制</div>
+                <div class="setting-desc">优化完成后自动将结果复制到剪贴板</div>
+              </div>
+              <div class="toggle-switch" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">保留优化历史</div>
+                <div class="setting-desc">保存每次优化的原文和结果</div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">面板位置</div>
+                <div class="setting-desc">优化面板的默认弹出位置</div>
+              </div>
+              <select class="setting-select" style="width:140px;">
+                <option>屏幕右侧</option>
+                <option>屏幕左侧</option>
+                <option>跟随光标</option>
+                <option>屏幕中央</option>
+              </select>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">默认优化指令</div>
+                <div class="setting-desc">按快捷键时默认使用的优化指令</div>
+              </div>
+              <select class="setting-select" style="width:140px;">
+                <option>✨ 润色</option>
+                <option>🌍 翻译</option>
+                <option>📋 摘要</option>
+                <option>📝 扩写</option>
+                <option>👔 正式化</option>
+                <option>💬 口语化</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- API Tab -->
+          <div class="settings-tabs" id="tab-api">
+            <div class="settings-section-title">API 配置</div>
+            <div class="setting-group">
+              <div class="setting-label">LLM 服务商</div>
+              <select class="setting-select">
+                <option>OpenAI (GPT-4o)</option>
+                <option>Anthropic (Claude)</option>
+                <option>DeepSeek</option>
+                <option>通义千问</option>
+                <option>自定义 (OpenAI 兼容)</option>
+              </select>
+            </div>
+            <div class="setting-group">
+              <div class="setting-label">API Key</div>
+              <div class="setting-desc">你的 API 密钥，存储在本地 Keychain 中，安全加密</div>
+              <input type="password" class="setting-input" value="sk-proj-xxxx...xxxx" />
+            </div>
+            <div class="setting-group">
+              <div class="setting-label">API Base URL</div>
+              <div class="setting-desc">自定义 API 端点（留空使用默认地址）</div>
+              <input type="text" class="setting-input" placeholder="https://api.openai.com/v1" />
+            </div>
+            <div class="setting-group">
+              <div class="setting-label">模型名称</div>
+              <input type="text" class="setting-input" value="gpt-4o" />
+            </div>
+            <div style="margin-top:16px;">
+              <button class="btn btn-primary">🔍 测试连接</button>
+            </div>
+          </div>
+
+          <!-- Prompts Tab -->
+          <div class="settings-tabs" id="tab-prompts">
+            <div class="settings-section-title">自定义指令</div>
+            <div class="setting-desc" style="margin-bottom:16px;">
+              所有指令均可自由编辑、删除和排序。拖拽可调整顺序。<br>
+              使用 <code style="background:var(--bg-tertiary);padding:2px 6px;border-radius:3px;">{{text}}</code> 作为原文占位符。
+            </div>
+            <div class="prompts-list">
+              <div class="prompt-card">
+                <div class="prompt-card-header">
+                  <span class="prompt-card-name">✨ 润色</span>
+                  <div class="prompt-card-actions">
+                    <button>✏️</button>
+                    <button>🗑️</button>
+                  </div>
+                </div>
+                <div class="prompt-card-preview">请对以下文本进行润色优化，保持原意不变，提升表达的流畅度和专业性：{{text}}</div>
+              </div>
+              <div class="prompt-card">
+                <div class="prompt-card-header">
+                  <span class="prompt-card-name">🌍 翻译</span>
+                  <div class="prompt-card-actions">
+                    <button>✏️</button>
+                    <button>🗑️</button>
+                  </div>
+                </div>
+                <div class="prompt-card-preview">请将以下文本翻译成自然流畅的目标语言，保持原意和语气：{{text}}</div>
+              </div>
+              <div class="prompt-card">
+                <div class="prompt-card-header">
+                  <span class="prompt-card-name">👔 正式化</span>
+                  <div class="prompt-card-actions">
+                    <button>✏️</button>
+                    <button>🗑️</button>
+                  </div>
+                </div>
+                <div class="prompt-card-preview">请将以下文本改写为正式、专业的商务用语，适合工作场合使用：{{text}}</div>
+              </div>
+              <div class="prompt-card">
+                <div class="prompt-card-header">
+                  <span class="prompt-card-name">😊 口语化</span>
+                  <div class="prompt-card-actions">
+                    <button>✏️</button>
+                    <button>🗑️</button>
+                  </div>
+                </div>
+                <div class="prompt-card-preview">请将以下文本改写为轻松自然的口语化表达，适合日常交流：{{text}}</div>
+              </div>
+              <div class="prompt-card">
+                <div class="prompt-card-header">
+                  <span class="prompt-card-name">📧 邮件润色</span>
+                  <div class="prompt-card-actions">
+                    <button>✏️</button>
+                    <button>🗑️</button>
+                  </div>
+                </div>
+                <div class="prompt-card-preview">请将以下文本优化为一封专业的商务邮件，保持原意不变，语气正式但友好：{{text}}</div>
+              </div>
+              <div class="prompt-card">
+                <div class="prompt-card-header">
+                  <span class="prompt-card-name">📱 社交文案</span>
+                  <div class="prompt-card-actions">
+                    <button>✏️</button>
+                    <button>🗑️</button>
+                  </div>
+                </div>
+                <div class="prompt-card-preview">将以下内容改写为适合社交媒体发布的文案，简洁有力，吸引眼球：{{text}}</div>
+              </div>
+              <button class="add-prompt-btn">+ 添加新指令</button>
+            </div>
+          </div>
+
+          <!-- History Tab -->
+          <div class="settings-tabs" id="tab-history">
+            <div class="settings-section-title">历史记录</div>
+            <div class="setting-row" style="margin-bottom:16px;">
+              <input type="text" class="setting-input" placeholder="🔍 搜索历史记录..." style="width:100%;" />
+            </div>
+            <div class="history-list">
+              <div class="history-item">
+                <div class="history-item-header">
+                  <span class="history-item-mode">✨ 润色</span>
+                  <span class="history-item-time">今天 16:28</span>
+                </div>
+                <div class="history-item-text">本周完成了三项重点工作：一是修复了用户反馈的登录异常问题；二是进行了页面性能优化...</div>
+              </div>
+              <div class="history-item">
+                <div class="history-item-header">
+                  <span class="history-item-mode">🌍 翻译</span>
+                  <span class="history-item-time">今天 14:15</span>
+                </div>
+                <div class="history-item-text">We are pleased to announce the launch of our new product line, which has been designed to meet the growing demands...</div>
+              </div>
+              <div class="history-item">
+                <div class="history-item-header">
+                  <span class="history-item-mode">👔 正式化</span>
+                  <span class="history-item-time">昨天 10:30</span>
+                </div>
+                <div class="history-item-text">经研究决定，现将项目验收时间调整为2026年5月15日，届时请各相关部门提前准备验收材料...</div>
+              </div>
+              <div class="history-item">
+                <div class="history-item-header">
+                  <span class="history-item-mode">📧 邮件润色</span>
+                  <span class="history-item-time">2026-04-14</span>
+                </div>
+                <div class="history-item-text">尊敬的张总，感谢您百忙之中抽出时间参加昨日的项目评审会议，会上您提出的几点建议...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shortcuts Tab -->
+          <div class="settings-tabs" id="tab-shortcuts">
+            <div class="settings-section-title">快捷键设置</div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">触发优化</div>
+                <div class="setting-desc">选中文本后触发文案优化</div>
+              </div>
+              <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:4px 12px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">⌃ Z</kbd>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">复制结果</div>
+                <div class="setting-desc">将优化结果复制到剪贴板</div>
+              </div>
+              <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:4px 12px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">⌘ ⇧ C</kbd>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">切换指令</div>
+                <div class="setting-desc">在指令之间快速切换（最多9个）</div>
+              </div>
+              <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:4px 12px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">⌘ 1-9</kbd>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">重新生成</div>
+                <div class="setting-desc">对当前原文重新进行优化</div>
+              </div>
+              <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:4px 12px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">⌘ R</kbd>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">关闭面板</div>
+                <div class="setting-desc">隐藏优化面板</div>
+              </div>
+              <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:4px 12px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">Esc</kbd>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">打开设置</div>
+                <div class="setting-desc">打开偏好设置窗口</div>
+              </div>
+              <kbd style="background:var(--bg-tertiary);border:1px solid var(--border);padding:4px 12px;border-radius:4px;font-size:12px;font-family:'SF Mono',monospace;">⌘ ⇧ ,</kbd>
+            </div>
+          </div>
+
+          <!-- About Tab -->
+          <div class="settings-tabs" id="tab-about">
+            <div style="text-align:center;padding-top:40px;">
+              <div style="width:64px;height:64px;background:var(--accent);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;margin-bottom:16px;">Ww</div>
+              <div style="font-size:20px;font-weight:600;margin-bottom:4px;">WordWhiz</div>
+              <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Version 1.0.0 (Build 1)</div>
+              <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;max-width:300px;margin:0 auto;">
+                WordWhiz 是一款 macOS 文案优化工具，通过全局快捷键一键调用 LLM 大语言模型，让你的文字表达更精准、更专业。
+              </div>
+              <div style="margin-top:24px;">
+                <button class="btn btn-secondary">检查更新</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Scene 5: User Flow ===== -->
+<div class="scene" id="scene-flow">
+  <div class="scene-menubar" style="min-height:auto;padding-bottom:20px;">
+    <div class="scene-title">核心使用流程</div>
+    <div class="scene-desc">
+      从选中文本到获得优化结果，只需3秒钟。
+    </div>
+  </div>
+  <div class="flow-container">
+    <div class="flow-diagram">
+      <div class="flow-step">
+        <div class="flow-step-num">1</div>
+        <div class="flow-step-content">
+          <div class="flow-step-title">选中文本</div>
+          <div class="flow-step-desc">在任意 App 中选中需要优化的文本内容（支持所有可选中文本的应用程序）</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step">
+        <div class="flow-step-num">2</div>
+        <div class="flow-step-content">
+          <div class="flow-step-title">按下快捷键 ⌃ Z</div>
+          <div class="flow-step-desc">WordWhiz 通过 macOS Accessibility API 获取选中文本，自动发送给 LLM 进行优化</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step">
+        <div class="flow-step-num">3</div>
+        <div class="flow-step-content">
+          <div class="flow-step-title">面板显示 & 流式输出</div>
+          <div class="flow-step-desc">优化面板自动弹出，实时流式显示 LLM 的优化结果，用户可以看到文字逐步生成</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step">
+        <div class="flow-step-num">4</div>
+        <div class="flow-step-content">
+          <div class="flow-step-title">查看 & 编辑结果</div>
+          <div class="flow-step-desc">生成完毕后，结果文本自动选中。用户可直接在面板中编辑，也可切换对比视图查看前后差异</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-branch">
+        <div class="flow-step" style="border-color:var(--accent);">
+          <div class="flow-step-num" style="background:var(--green);">A</div>
+          <div class="flow-step-content">
+            <div class="flow-step-title">复制粘贴</div>
+            <div class="flow-step-desc">点击"复制结果"或 ⌘⇧C，回到原 App 粘贴</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:var(--orange);">B</div>
+          <div class="flow-step-content">
+            <div class="flow-step-title">重新生成</div>
+            <div class="flow-step-desc">不满意？按 ⌘R 或点击重新生成按钮</div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step" style="border-color:var(--green);background:rgba(76,217,100,0.05);">
+        <div class="flow-step-num" style="background:var(--green);">✓</div>
+        <div class="flow-step-content">
+          <div class="flow-step-title">完成</div>
+          <div class="flow-step-desc">优化记录自动保存至历史列表，面板可通过 Esc 键隐藏或保持常驻</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Scene navigation
+  function showScene(name) {
+    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('scene-' + name).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // Menu bar dropdown
+  function toggleDropdown() {
+    document.getElementById('menubar-dropdown').classList.toggle('show');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#politext-tray') && !e.target.closest('#menubar-dropdown')) {
+      document.getElementById('menubar-dropdown').classList.remove('show');
+    }
+  });
+
+  // Mode selector
+  function selectMode(el) {
+    el.parentElement.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Source text collapse
+  function toggleSource() {
+    const src = document.getElementById('source-text');
+    const btn = event.target;
+    src.classList.toggle('collapsed');
+    btn.textContent = src.classList.contains('collapsed') ? '展开 ▾' : '收起 ▴';
+  }
+
+  // Diff view toggle
+  let diffMode = false;
+  function toggleDiffView() {
+    diffMode = !diffMode;
+    document.getElementById('result-normal').style.display = diffMode ? 'none' : 'block';
+    document.getElementById('result-diff').style.display = diffMode ? 'block' : 'none';
+  }
+
+  // Copy result
+  function copyResult() {
+    const text = document.getElementById('result-textarea').value;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = event.target;
+      btn.textContent = '✅ 已复制';
+      setTimeout(() => { btn.textContent = '📋 复制结果'; }, 1500);
+    });
+  }
+
+  // Regenerate animation
+  function regenerate() {
+    const textarea = document.getElementById('result-textarea');
+    const original = textarea.value;
+    textarea.value = '';
+    textarea.placeholder = '重新生成中...';
+    textarea.disabled = true;
+    setTimeout(() => {
+      textarea.value = original;
+      textarea.placeholder = '';
+      textarea.disabled = false;
+    }, 1500);
+  }
+
+  // Streaming simulation
+  let streamInterval = null;
+  const streamText = '本周完成了三项重点工作：一是修复了用户反馈的登录异常问题；二是进行了页面性能优化，显著提升了加载速度；三是与设计团队完成了新版首页方案的初步评审，整体方向达成一致，后续将针对细节进行进一步打磨。';
+
+  function startStreaming() {
+    const output = document.getElementById('streaming-output');
+    const status = document.getElementById('stream-status');
+    const copyBtn = document.getElementById('loading-copy-btn');
+    const startBtn = document.getElementById('start-stream-btn');
+    
+    output.innerHTML = '<span class="streaming-text"></span><span class="streaming-cursor"></span>';
+    status.textContent = '● 生成中...';
+    status.style.color = 'var(--accent)';
+    copyBtn.disabled = true;
+    copyBtn.style.opacity = '0.5';
+    startBtn.disabled = true;
+    startBtn.style.opacity = '0.5';
+    
+    const textEl = output.querySelector('.streaming-text');
+    let i = 0;
+    
+    streamInterval = setInterval(() => {
+      if (i < streamText.length) {
+        textEl.textContent += streamText[i];
+        i++;
+      } else {
+        clearInterval(streamInterval);
+        streamInterval = null;
+        output.querySelector('.streaming-cursor').remove();
+        status.textContent = '✓ 生成完成';
+        status.style.color = 'var(--green)';
+        copyBtn.disabled = false;
+        copyBtn.style.opacity = '1';
+        startBtn.disabled = false;
+        startBtn.style.opacity = '1';
+      }
+    }, 40);
+  }
+
+  function stopStreaming() {
+    if (streamInterval) {
+      clearInterval(streamInterval);
+      streamInterval = null;
+      const output = document.getElementById('streaming-output');
+      const cursor = output.querySelector('.streaming-cursor');
+      if (cursor) cursor.remove();
+      document.getElementById('stream-status').textContent = '⏸ 已停止';
+      document.getElementById('stream-status').style.color = 'var(--orange)';
+      document.getElementById('loading-copy-btn').disabled = false;
+      document.getElementById('loading-copy-btn').style.opacity = '1';
+      document.getElementById('start-stream-btn').disabled = false;
+      document.getElementById('start-stream-btn').style.opacity = '1';
+    }
+  }
+
+  function resetStreaming() {
+    stopStreaming();
+    document.getElementById('streaming-output').innerHTML = `
+      <div class="streaming-skeleton" style="width:100%"></div>
+      <div class="streaming-skeleton" style="width:90%"></div>
+      <div class="streaming-skeleton" style="width:70%"></div>
+    `;
+    document.getElementById('stream-status').textContent = '● 生成中...';
+    document.getElementById('stream-status').style.color = 'var(--accent)';
+    document.getElementById('loading-copy-btn').disabled = true;
+    document.getElementById('loading-copy-btn').style.opacity = '0.5';
+  }
+
+  // Settings tabs
+  function showSettingsTab(name, el) {
+    document.querySelectorAll('.settings-tabs').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.settings-nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    el.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
