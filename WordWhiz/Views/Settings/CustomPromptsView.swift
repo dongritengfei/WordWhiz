@@ -23,6 +23,27 @@ struct CustomPromptsView: View {
 
             ScrollView {
                 VStack(spacing: 10) {
+                    // Add button at top
+                    Button {
+                        isNewPrompt = true
+                        editingPrompt = CustomPrompt(name: "", promptTemplate: "请优化以下文本：\n\n{{text}}")
+                    } label: {
+                        HStack {
+                            Image(systemName: "plus")
+                            Text("添加新指令")
+                        }
+                        .font(.system(size: 13))
+                        .foregroundColor(BrandColors.textMuted)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [8]))
+                                .foregroundColor(BrandColors.border)
+                        )
+                    }
+                    .buttonStyle(.plain)
+
                     ForEach(Array(prompts.enumerated()), id: \.element.id) { index, prompt in
                         PromptCard(
                             prompt: prompt,
@@ -43,27 +64,6 @@ struct CustomPromptsView: View {
                             }
                         )
                     }
-
-                    // Add button at bottom
-                    Button {
-                        isNewPrompt = true
-                        editingPrompt = CustomPrompt(name: "", promptTemplate: "请优化以下文本：\n\n{{text}}")
-                    } label: {
-                        HStack {
-                            Image(systemName: "plus")
-                            Text("添加新指令")
-                        }
-                        .font(.system(size: 13))
-                        .foregroundColor(BrandColors.textMuted)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [8]))
-                                .foregroundColor(BrandColors.border)
-                        )
-                    }
-                    .buttonStyle(.plain)
                 }
             }
         }

@@ -24,7 +24,5 @@
 	<true/>
 	<key>NSAccessibilityUsageDescription</key>
 	<string>WordWhiz needs Accessibility permission to read selected text in other applications and register global keyboard shortcuts.</string>
-	<key>NSAppleEventsUsageDescription</key>
-	<string>WordWhiz needs Automation permission to interact with other applications.</string>
 </dict>
 </plist>

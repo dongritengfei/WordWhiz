@@ -16,7 +16,7 @@ enum BrandColors {
     // Text
     static let textPrimary = Color(hex: "E8E8E8")
     static let textSecondary = Color(hex: "999999")
-    static let textMuted = Color(hex: "666666")
+    static let textMuted = Color(hex: "888888")
 
     // Semantic
     static let border = Color(hex: "3A3A3A")

@@ -28,6 +28,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // Force dark appearance globally so system controls (TextField placeholders, Pickers, Toggles)
+        // use dark-mode colors that are visible against our custom dark backgrounds
+        NSApp.appearance = NSAppearance(named: .darkAqua)
+
         NSApp.setActivationPolicy(.accessory)
         NotificationService.shared.requestPermission()
 
@@ -179,8 +183,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Retry hotkey registration (called from menu bar after user grants permission)
     func retryHotkeyRegistration() {
-        if settingsViewModel.hotkeyEnabled {
-            hotkeyService?.register()
-        }
+        settingsViewModel.hotkeyEnabled = true
+        hotkeyService?.register()
     }
 }

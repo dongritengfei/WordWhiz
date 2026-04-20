@@ -18,6 +18,7 @@
 		187DF9E5F5FDF8CCA58754EE /* ModeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699047EE83CFED55E095093C /* ModeSelectorView.swift */; };
 		231301788876D38DBA4E378B /* CustomPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A84B439044C6149E898A60A8 /* CustomPrompt.swift */; };
 		23ECEC13B30E74C7CC20D2DF /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D77DFEEAA8A4E7D8DD71082C /* KeychainService.swift */; };
+		27E52FF4724E202E657840AB /* StyledTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197DF6FD432E60F6CD7A8B65 /* StyledTextField.swift */; };
 		2DFD84B95B08A54C2B4EFB56 /* PanelWindowService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A106FE43641FFD28CF2771 /* PanelWindowService.swift */; };
 		367580852E6D0947007153B3 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF2E8B39425B937D3E345A59 /* AboutView.swift */; };
 		3EFE7F9C65F8C1EF12F10C23 /* PanelPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED5DCEEECB26B46C86204163 /* PanelPosition.swift */; };
@@ -27,6 +28,7 @@
 		4B3841ABA1D5F7A9174D064D /* SourceSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6924599590955BD15E47827A /* SourceSectionView.swift */; };
 		4BC8DD3A3DB1A80DCB12C80A /* DeepSeekProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D54039505D44F2F482E3C706 /* DeepSeekProvider.swift */; };
 		4BE27430B8B0FD9FA43C8A57 /* DiffCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D18D3D9FCCF3F0D19B5133C1 /* DiffCalculator.swift */; };
+		4EFD2467C8A9765DDADCB324 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6ABBC3C79A9AB2FDAB8F25E3 /* Assets.xcassets */; };
 		543B6BCCDCB0734F3E73DAB8 /* HistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4178FAA750E9C6997EA761 /* HistoryViewModel.swift */; };
 		55E147A7EF56E06CE921C0D8 /* OptimizationRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C600B932E5ADE4B82B62043 /* OptimizationRecord.swift */; };
 		5F5976E4B29901BFC45377E7 /* StreamingStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50846C7F9B6656704AE6CB99 /* StreamingStatusView.swift */; };
@@ -69,6 +71,7 @@
 		13D6C1207EBDF7D685E3C605 /* WordWhizApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordWhizApp.swift; sourceTree = "<group>"; };
 		140F3FA640BE900D8DA0FADD /* CustomPromptsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPromptsView.swift; sourceTree = "<group>"; };
 		157FA3C0365B589F3B8ADFAA /* AnthropicProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnthropicProvider.swift; sourceTree = "<group>"; };
+		197DF6FD432E60F6CD7A8B65 /* StyledTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyledTextField.swift; sourceTree = "<group>"; };
 		29EC4F2399D5EE8D80FD51F7 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		2FE6C6211FF2F023BB15FE94 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		35159D54242141989449AEB6 /* WordWhiz.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WordWhiz.entitlements; sourceTree = "<group>"; };
@@ -82,6 +85,7 @@
 		61D0F0F3A820FB04BC5FB12E /* CustomPromptViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPromptViewModel.swift; sourceTree = "<group>"; };
 		6924599590955BD15E47827A /* SourceSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourceSectionView.swift; sourceTree = "<group>"; };
 		699047EE83CFED55E095093C /* ModeSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeSelectorView.swift; sourceTree = "<group>"; };
+		6ABBC3C79A9AB2FDAB8F25E3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6AEA28EB3946DA4067C1CF98 /* WindowOpenerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowOpenerView.swift; sourceTree = "<group>"; };
 		7124CAB14FF273CC75AAE710 /* QwenProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QwenProvider.swift; sourceTree = "<group>"; };
 		73DFEE30223A2F2E01124C45 /* ResultSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultSectionView.swift; sourceTree = "<group>"; };
@@ -184,6 +188,7 @@
 			isa = PBXGroup;
 			children = (
 				94AE6D23ED5C82EC8FB29C55 /* BrandColors.swift */,
+				197DF6FD432E60F6CD7A8B65 /* StyledTextField.swift */,
 				6AEA28EB3946DA4067C1CF98 /* WindowOpenerView.swift */,
 			);
 			path = Shared;
@@ -240,6 +245,7 @@
 		8C2D2CC7BE66CCF42C4D2BFD /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				6ABBC3C79A9AB2FDAB8F25E3 /* Assets.xcassets */,
 				9C18D160A50668CB7D906BB3 /* Info.plist */,
 				35159D54242141989449AEB6 /* WordWhiz.entitlements */,
 			);
@@ -320,6 +326,7 @@
 			buildConfigurationList = 98F7D019E9BF7701CEBE1DEF /* Build configuration list for PBXNativeTarget "WordWhiz" */;
 			buildPhases = (
 				0658660BBD65C29966ED43D5 /* Sources */,
+				EE89E911B60F9B367661770D /* Resources */,
 				D1AF5A3B781A2DD54B1BFB1A /* Frameworks */,
 			);
 			buildRules = (
@@ -370,6 +377,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EE89E911B60F9B367661770D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4EFD2467C8A9765DDADCB324 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0658660BBD65C29966ED43D5 /* Sources */ = {
@@ -422,6 +440,7 @@
 				0FF8486A7135205ED4B8F646 /* ShortcutSettingsView.swift in Sources */,
 				4B3841ABA1D5F7A9174D064D /* SourceSectionView.swift in Sources */,
 				5F5976E4B29901BFC45377E7 /* StreamingStatusView.swift in Sources */,
+				27E52FF4724E202E657840AB /* StyledTextField.swift in Sources */,
 				13D3C92B5659B51F74ECC719 /* WelcomeStepView.swift in Sources */,
 				7AF2F912DFDB277881EE9F27 /* WindowOpenerView.swift in Sources */,
 				E5496C88B5CEE6254058BEA7 /* WordWhizApp.swift in Sources */,

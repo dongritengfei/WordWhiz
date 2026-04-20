@@ -27,10 +27,7 @@ struct HistorySettingsView: View {
             .padding(.bottom, 16)
 
             // Search bar
-            TextField("搜索历史记录...", text: $searchText)
-                .textFieldStyle(.plain)
-                .font(.system(size: 13))
-                .foregroundColor(BrandColors.textPrimary)
+            StyledTextField(text: $searchText, placeholder: "搜索历史记录...")
                 .padding(8)
                 .background(BrandColors.bgSecondary)
                 .cornerRadius(6)

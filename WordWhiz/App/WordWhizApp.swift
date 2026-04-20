@@ -10,6 +10,7 @@ struct WordWhizApp: App {
             MenuBarView()
                 .environment(appDelegate.panelViewModel)
                 .environment(appDelegate.settingsViewModel)
+                .preferredColorScheme(.dark)
         } label: {
             Text("Ww")
                 .font(.system(size: 11, weight: .bold))
@@ -24,6 +25,7 @@ struct WordWhizApp: App {
             OnboardingView()
                 .environment(appDelegate.onboardingViewModel)
                 .environment(appDelegate.settingsViewModel)
+                .preferredColorScheme(.dark)
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
@@ -33,6 +35,7 @@ struct WordWhizApp: App {
             SettingsWindowView()
                 .environment(appDelegate.settingsViewModel)
                 .modelContainer(appDelegate.modelContainer)
+                .preferredColorScheme(.dark)
         }
         .windowStyle(.titleBar)
         .windowResizability(.contentSize)

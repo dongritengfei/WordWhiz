@@ -22,15 +22,14 @@ struct MenuBarView: View {
             Text(statusText)
 
             Button("偏好设置...") {
-                openWindow(id: "settings")
-                NSApp.activate(ignoringOtherApps: true)
+                AppDelegate.shared?.openSettings()
             }
 
             Divider()
 
             // HotKey library doesn't require accessibility permission
-            if AppDelegate.shared?.hotkeyService?.isEnabled() ?? false {
-                Button(settingsViewModel.hotkeyEnabled ? "✓ 全局快捷键已启用" : "全局快捷键已启用") {
+            if settingsViewModel.hotkeyEnabled {
+                Button("✓ 全局快捷键已启用") {
                     settingsViewModel.hotkeyEnabled.toggle()
                 }
             } else {

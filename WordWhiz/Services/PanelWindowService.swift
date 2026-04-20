@@ -152,6 +152,7 @@ final class PanelWindowService {
         newPanel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         newPanel.hidesOnDeactivate = false
         newPanel.isReleasedWhenClosed = false
+        newPanel.appearance = NSAppearance(named: .darkAqua)
 
         // Set content view
         let hostingView = NSHostingView(

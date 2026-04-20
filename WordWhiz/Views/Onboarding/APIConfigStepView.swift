@@ -47,10 +47,7 @@ struct APIConfigStepView: View {
                         .foregroundColor(BrandColors.textPrimary)
                         .frame(width: 60, alignment: .leading)
 
-                    SecureField("输入 API Key", text: $settingsVM.apiKey)
-                        .textFieldStyle(.plain)
-                        .font(.system(size: 13))
-                        .foregroundColor(BrandColors.textPrimary)
+                    StyledSecureField(text: $settingsVM.apiKey, placeholder: "输入 API Key")
                         .padding(8)
                         .background(BrandColors.bgSecondary)
                         .cornerRadius(6)

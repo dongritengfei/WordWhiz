@@ -362,7 +362,7 @@
 
   /* Diff highlight */
   .diff-view {
-    min-height: 140px;
+    min-height: 200px;
     background: var(--bg-secondary);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -403,7 +403,7 @@
     padding: 60px 20px 40px;
   }
   .loading-panel {
-    width: 400px;
+    width: 480px;
     background: var(--bg-panel);
     border: 1px solid var(--border);
     border-radius: 12px;
@@ -715,7 +715,7 @@
   @media (max-width: 960px) {
     .panel-container { flex-direction: column; align-items: center; }
     .bg-app { width: 100%; max-width: 520px; }
-    .main-panel { width: 100%; max-width: 400px; }
+    .main-panel { width: 100%; max-width: 480px; }
   }
 
   /* page labels */
@@ -791,30 +791,27 @@
 
       <div class="menubar-dropdown" id="menubar-dropdown">
         <div class="dropdown-item">
-          <span>📋 打开优化面板</span>
-          <span class="shortcut">⌃ Z</span>
+          <span>打开优化面板</span>
         </div>
         <div class="dropdown-item">
-          <span>🧪 测试面板（示例文本）</span>
+          <span>测试面板（示例文本）</span>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item" style="cursor:default;color:var(--text-secondary);">
+          <span>● 服务已就绪</span>
         </div>
         <div class="dropdown-divider"></div>
         <div class="dropdown-item">
-          <span style="display:flex;align-items:center;gap:8px;">
-            <span class="status-dot"></span> 服务已就绪
-          </span>
+          <span>偏好设置...</span>
         </div>
         <div class="dropdown-divider"></div>
-        <div class="dropdown-item">
-          <span>🔧 偏好设置...</span>
-        </div>
-        <div class="dropdown-divider"></div>
-        <div class="dropdown-item">
-          <span>✓ 全局快捷键已启用</span>
+        <div class="dropdown-item" onclick="toggleHotkey(this)">
+          <span id="hotkey-toggle-text">✓ 全局快捷键已启用</span>
+          <span class="shortcut" style="font-size:11px;color:var(--text-muted);">点击切换</span>
         </div>
         <div class="dropdown-divider"></div>
         <div class="dropdown-item" style="color:var(--text-muted);">
           <span>退出 WordWhiz</span>
-          <span class="shortcut">⌘ Q</span>
         </div>
       </div>
     </div>
@@ -963,7 +960,7 @@
           优化结果
           <span style="font-size:11px;color:var(--accent);" id="stream-status">● 生成中...</span>
         </div>
-        <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:12px;min-height:140px;">
+        <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:12px;min-height:200px;">
           <div id="streaming-output">
             <div class="streaming-skeleton" style="width:100%"></div>
             <div class="streaming-skeleton" style="width:90%"></div>
@@ -1008,7 +1005,7 @@
             <span class="nav-icon">🔑</span> 模型配置
           </button>
           <button class="settings-nav-item" onclick="showSettingsTab('prompts', this)">
-            <span class="nav-icon">📝</span> 自定义指令
+            <span class="nav-icon">📝</span> 指令管理
           </button>
           <button class="settings-nav-item" onclick="showSettingsTab('history', this)">
             <span class="nav-icon">🕘</span> 历史记录
@@ -1114,12 +1111,13 @@
 
           <!-- Prompts Tab -->
           <div class="settings-tabs" id="tab-prompts">
-            <div class="settings-section-title">自定义指令</div>
+            <div class="settings-section-title">指令管理</div>
             <div class="setting-desc" style="margin-bottom:16px;">
               所有指令均可自由编辑、删除和排序。拖拽可调整顺序。<br>
               使用 <code style="background:var(--bg-tertiary);padding:2px 6px;border-radius:3px;">{{text}}</code> 作为原文占位符。
             </div>
             <div class="prompts-list">
+              <button class="add-prompt-btn">+ 添加新指令</button>
               <div class="prompt-card">
                 <div class="prompt-card-header">
                   <span class="prompt-card-name">✨ 润色</span>
@@ -1180,7 +1178,6 @@
                 </div>
                 <div class="prompt-card-preview">将以下内容改写为适合社交媒体发布的文案，简洁有力，吸引眼球：{{text}}</div>
               </div>
-              <button class="add-prompt-btn">+ 添加新指令</button>
             </div>
           </div>
 
@@ -1377,6 +1374,16 @@
       document.getElementById('menubar-dropdown').classList.remove('show');
     }
   });
+
+  // Toggle hotkey enabled state (like MenuBarView)
+  function toggleHotkey(el) {
+    const text = document.getElementById('hotkey-toggle-text');
+    if (text.textContent.startsWith('✓')) {
+      text.textContent = '全局快捷键已启用';
+    } else {
+      text.textContent = '✓ 全局快捷键已启用';
+    }
+  }
 
   // Mode selector
   function selectMode(el) {
