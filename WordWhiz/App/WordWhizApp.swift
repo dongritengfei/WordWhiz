@@ -4,6 +4,7 @@ import SwiftData
 @main
 struct WordWhizApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @Environment(\.openWindow) private var openWindow
 
     var body: some Scene {
         MenuBarExtra(isInserted: .constant(true)) {
@@ -26,6 +27,9 @@ struct WordWhizApp: App {
                 .environment(appDelegate.onboardingViewModel)
                 .environment(appDelegate.settingsViewModel)
                 .preferredColorScheme(.dark)
+                .onAppear {
+                    NSApp.activate(ignoringOtherApps: true)
+                }
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)

@@ -13,6 +13,7 @@ struct APIConfigStepView: View {
             Image(systemName: "key.fill")
                 .font(.system(size: 48))
                 .foregroundColor(BrandColors.accent)
+                .frame(width: 80, height: 80)
 
             Text("配置 API")
                 .font(.system(size: 24, weight: .bold))

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		02AB90FED6270995DA4EE3B0 /* ActionBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21FAFBB66AD05CE683DD9A5 /* ActionBarView.swift */; };
 		041F1366E2163044CD928869 /* SettingsWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAE42EFA634334C6A692110C /* SettingsWindowView.swift */; };
-		0486A069FD1D18406695E7BE /* AccessibilityStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A679119787653016B92FE09E /* AccessibilityStepView.swift */; };
 		09FC8C1B555B21E6CF6A3B5E /* ClipboardService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049639928F7811745298ACAF /* ClipboardService.swift */; };
 		0FF8486A7135205ED4B8F646 /* ShortcutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C89B8FFFD926865602AE38A /* ShortcutSettingsView.swift */; };
 		138E1B6E39E9A5C35DF389E9 /* HistorySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 579E8D44CFEFF34D522A1ECC /* HistorySettingsView.swift */; };
@@ -99,7 +98,6 @@
 		9C18D160A50668CB7D906BB3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9C600B932E5ADE4B82B62043 /* OptimizationRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimizationRecord.swift; sourceTree = "<group>"; };
 		A2191C965EBD8800C30AB6F8 /* DiffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffView.swift; sourceTree = "<group>"; };
-		A679119787653016B92FE09E /* AccessibilityStepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityStepView.swift; sourceTree = "<group>"; };
 		A84B439044C6149E898A60A8 /* CustomPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPrompt.swift; sourceTree = "<group>"; };
 		AE0FC32AE1A97528CCB84DF0 /* WordWhiz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WordWhiz.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7BC6100A6BDD85866241764 /* LLMProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMProviderProtocol.swift; sourceTree = "<group>"; };
@@ -283,7 +281,6 @@
 		CB6E187363DE17FE0F60206E /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
-				A679119787653016B92FE09E /* AccessibilityStepView.swift */,
 				E208451FCBA258AB7442E3DD /* APIConfigStepView.swift */,
 				364877C4883FE232F1526386 /* OnboardingView.swift */,
 				9A777C07E935EB4499AACC43 /* WelcomeStepView.swift */,
@@ -398,7 +395,6 @@
 				1473C6C163DDBE80110BA20B /* APISettingsView.swift in Sources */,
 				367580852E6D0947007153B3 /* AboutView.swift in Sources */,
 				87220B853F54D1C2AB2C1086 /* AccessibilityChecker.swift in Sources */,
-				0486A069FD1D18406695E7BE /* AccessibilityStepView.swift in Sources */,
 				02AB90FED6270995DA4EE3B0 /* ActionBarView.swift in Sources */,
 				96365B1412E86205612BB000 /* AnthropicProvider.swift in Sources */,
 				E4997BF648A8EF3B79D86E32 /* AppDelegate.swift in Sources */,

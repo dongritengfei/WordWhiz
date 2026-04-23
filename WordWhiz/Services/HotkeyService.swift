@@ -4,6 +4,7 @@ import HotKey
 /// Notification posted when the hotkey is triggered
 extension Notification.Name {
     static let hotkeyTriggered = Notification.Name("hotkeyTriggered")
+    static let hotkeyConfigChanged = Notification.Name("hotkeyConfigChanged")
 }
 
 /// Represents a keyboard shortcut that can be stored in UserDefaults
@@ -78,6 +79,7 @@ final class HotkeyService {
         saveConfig(config)
         currentConfig = loadConfig()
         attemptRegisterHotKey()
+        NotificationCenter.default.post(name: .hotkeyConfigChanged, object: nil)
     }
 
     func unregister() {

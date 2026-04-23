@@ -12,6 +12,12 @@ struct SourceSectionView: View {
                     .foregroundColor(BrandColors.textMuted)
                     .textCase(.uppercase)
 
+                if !viewModel.sourceText.isEmpty {
+                    Text("\(viewModel.sourceText.count) 字")
+                        .font(.system(size: 11))
+                        .foregroundColor(BrandColors.textMuted)
+                }
+
                 Spacer()
 
                 Button {

@@ -15,6 +15,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Whether accessibility permission has been granted (observable for menu bar UI)
     var accessibilityGranted: Bool = false
 
+    /// Flag to indicate onboarding should be shown on startup
+    var needsOnboarding: Bool = false
+
     let modelContainer: ModelContainer
 
     override init() {
@@ -93,7 +96,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let hasCompletedOnboarding = UserDefaults.standard.bool(forKey: Constants.hasCompletedOnboardingKey)
         if !hasCompletedOnboarding {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            needsOnboarding = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.openOnboarding()
             }
         }
@@ -133,15 +137,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func openOnboarding() {
+        // First try to find an existing onboarding window
         if let window = NSApp.windows.first(where: { $0.title.contains("Onboarding") }) {
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
-        } else {
-            NotificationCenter.default.post(name: .openOnboardingWindow, object: nil)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                NSApp.activate(ignoringOtherApps: true)
-            }
+            return
         }
+
+        // Create the onboarding window directly via AppKit
+        let onboardingView = OnboardingView()
+            .environment(onboardingViewModel)
+            .environment(settingsViewModel)
+            .preferredColorScheme(.dark)
+
+        let hostingController = NSHostingController(rootView: onboardingView)
+        let window = NSWindow(contentViewController: hostingController)
+        window.title = "Onboarding"
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
+        window.styleMask = [.titled, .closable, .fullSizeContentView]
+        window.setContentSize(NSSize(width: 520, height: 520))
+        window.center()
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     func openSettings() {

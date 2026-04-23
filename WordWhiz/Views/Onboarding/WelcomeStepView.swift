@@ -22,7 +22,7 @@ struct WelcomeStepView: View {
 
             VStack(alignment: .leading, spacing: 12) {
                 FeatureRow(icon: "text.cursor", text: "在任意应用中选中文本")
-                FeatureRow(icon: "keyboard", text: "按 ⌘. 一键触发优化")
+                FeatureRow(icon: "keyboard", text: "按 ⌃Z 一键触发优化")
                 FeatureRow(icon: "sparkles", text: "LLM 实时流式生成结果")
                 FeatureRow(icon: "doc.on.doc", text: "一键复制，即时使用")
             }

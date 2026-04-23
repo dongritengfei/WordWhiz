@@ -7,20 +7,15 @@ struct OnboardingView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Step content
-            TabView(selection: Binding(
-                get: { viewModel.currentStep },
-                set: { viewModel.currentStep = $0 }
-            )) {
-                WelcomeStepView()
-                    .tag(0)
-
-                AccessibilityStepView()
-                    .tag(1)
-
-                APIConfigStepView()
-                    .tag(2)
+            Group {
+                switch viewModel.currentStep {
+                case 0:
+                    WelcomeStepView()
+                default:
+                    APIConfigStepView()
+                }
             }
-            .tabViewStyle(.automatic)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .animation(.easeInOut, value: viewModel.currentStep)
 
             // Navigation

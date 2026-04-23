@@ -16,7 +16,6 @@ struct OptimizationPanelView: View {
             ModeSelectorView()
             SourceSectionView()
             ResultSectionView(isEditorFocused: $isResultEditorFocused)
-            ActionBarView(isEditorFocused: $isResultEditorFocused)
         }
         .background(BrandColors.bgPanel)
         .clipShape(RoundedRectangle(cornerRadius: Constants.panelCornerRadius))

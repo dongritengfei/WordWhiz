@@ -2,8 +2,8 @@ import Foundation
 
 enum Constants {
     // Panel dimensions
-    static let panelWidth: CGFloat = 400
-    static let panelHeight: CGFloat = 560
+    static let panelWidth: CGFloat = 660
+    static let panelHeight: CGFloat = 660
     static let panelCornerRadius: CGFloat = 12
 
     // Animation

@@ -78,7 +78,7 @@ struct ResultSectionView: View {
         RoundedRectangle(cornerRadius: 8)
             .fill(BrandColors.bgSecondary)
             .overlay(
-                Text("选中文本后按 ⌘. 开始优化")
+                Text("选中文本后按 \(viewModel.hotkeyDisplay) 开始优化")
                     .font(.system(size: 14))
                     .foregroundColor(BrandColors.textMuted)
             )

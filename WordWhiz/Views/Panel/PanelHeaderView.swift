@@ -39,6 +39,20 @@ struct PanelHeaderView: View {
                 }
 
                 Button {
+                    viewModel.regenerate()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                        .foregroundColor(BrandColors.textSecondary)
+                        .font(.system(size: 12))
+                        .frame(width: 28, height: 28)
+                        .background(BrandColors.bgTertiary)
+                        .cornerRadius(6)
+                }
+                .buttonStyle(.plain)
+                .contentShape(Rectangle())
+                .disabled(viewModel.streamingStatus.isStreaming)
+
+                Button {
                     AppDelegate.shared?.openSettings()
                 } label: {
                     Image(systemName: "gearshape")
@@ -58,6 +72,19 @@ struct PanelHeaderView: View {
                     Image(systemName: viewModel.isPinned ? "pin.fill" : "pin")
                         .foregroundColor(viewModel.isPinned ? BrandColors.accent : BrandColors.textSecondary)
                         .font(.system(size: 12))
+                        .frame(width: 28, height: 28)
+                        .background(BrandColors.bgTertiary)
+                        .cornerRadius(6)
+                }
+                .buttonStyle(.plain)
+                .contentShape(Rectangle())
+
+                Button {
+                    AppDelegate.shared?.getPanelWindowService()?.hide()
+                } label: {
+                    Image(systemName: "xmark")
+                        .foregroundColor(BrandColors.textSecondary)
+                        .font(.system(size: 12, weight: .medium))
                         .frame(width: 28, height: 28)
                         .background(BrandColors.bgTertiary)
                         .cornerRadius(6)

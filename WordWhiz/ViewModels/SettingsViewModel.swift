@@ -7,6 +7,7 @@ final class SettingsViewModel {
     // General settings
     var launchAtLogin: Bool {
         didSet {
+            UserDefaults.standard.set(launchAtLogin, forKey: Constants.launchAtLoginKey)
             do {
                 if launchAtLogin {
                     try SMAppService.mainApp.register()
@@ -14,9 +15,9 @@ final class SettingsViewModel {
                     try SMAppService.mainApp.unregister()
                 }
             } catch {
-                launchAtLogin = oldValue
+                // SMAppService may fail in debug/unsigned builds; preference is still saved
+                NSLog("[WordWhiz] SMAppService error: \(error.localizedDescription)")
             }
-            UserDefaults.standard.set(launchAtLogin, forKey: Constants.launchAtLoginKey)
         }
     }
 
@@ -89,16 +90,16 @@ final class SettingsViewModel {
     private var isInitializing: Bool = true
 
     init() {
-        self.launchAtLogin = UserDefaults.standard.object(forKey: Constants.launchAtLoginKey) as? Bool ?? false
+        self.launchAtLogin = UserDefaults.standard.object(forKey: Constants.launchAtLoginKey) as? Bool ?? true
         self.showDockIcon = UserDefaults.standard.object(forKey: Constants.showDockIconKey) as? Bool ?? false
-        self.autoCopy = UserDefaults.standard.object(forKey: Constants.autoCopyKey) as? Bool ?? false
+        self.autoCopy = UserDefaults.standard.object(forKey: Constants.autoCopyKey) as? Bool ?? true
         self.keepHistory = UserDefaults.standard.object(forKey: Constants.keepHistoryKey) as? Bool ?? true
 
         let posRaw = UserDefaults.standard.string(forKey: Constants.panelPositionKey) ?? PanelPosition.screenRight.rawValue
         self.panelPosition = PanelPosition(rawValue: posRaw) ?? .screenRight
 
-        let providerRaw = UserDefaults.standard.string(forKey: Constants.llmProviderKey) ?? LLMProviderConfig.openAI.rawValue
-        self.llmProvider = LLMProviderConfig(rawValue: providerRaw) ?? .openAI
+        let providerRaw = UserDefaults.standard.string(forKey: Constants.llmProviderKey) ?? LLMProviderConfig.qwen.rawValue
+        self.llmProvider = LLMProviderConfig(rawValue: providerRaw) ?? .qwen
 
         self.apiBaseURL = UserDefaults.standard.string(forKey: Constants.apiBaseURLKey) ?? ""
         self.modelName = UserDefaults.standard.string(forKey: Constants.modelNameKey) ?? ""

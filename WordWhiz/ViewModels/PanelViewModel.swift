@@ -57,9 +57,13 @@ final class PanelViewModel {
     var isSourceCollapsed: Bool = false
     var isPinned: Bool = false
     var showCopiedFeedback: Bool = false
+    var hotkeyDisplay: String = HotkeyConfig.defaultConfig.displayString
 
     // ModelContext for SwiftData (set by AppDelegate)
     var modelContext: ModelContext?
+
+    // Hotkey observer (nonisolated to allow deinit access)
+    nonisolated(unsafe) private var hotkeyObserver: NSObjectProtocol?
 
     // Character count
     var resultCharacterCount: Int {
@@ -75,6 +79,23 @@ final class PanelViewModel {
 
     // Task management
     private var streamingTask: Task<Void, Never>?
+
+    init() {
+        hotkeyDisplay = AppDelegate.shared?.getHotkeyDisplay() ?? HotkeyConfig.defaultConfig.displayString
+        hotkeyObserver = NotificationCenter.default.addObserver(
+            forName: .hotkeyConfigChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.hotkeyDisplay = AppDelegate.shared?.getHotkeyDisplay() ?? HotkeyConfig.defaultConfig.displayString
+        }
+    }
+
+    deinit {
+        if let hotkeyObserver {
+            NotificationCenter.default.removeObserver(hotkeyObserver)
+        }
+    }
 
     // MARK: - Actions
 
@@ -218,8 +239,8 @@ final class PanelViewModel {
     }
 
     private func createCurrentProvider() -> LLMProviderProtocol? {
-        let providerRawValue = UserDefaults.standard.string(forKey: Constants.llmProviderKey) ?? LLMProviderConfig.openAI.rawValue
-        let config = LLMProviderConfig(rawValue: providerRawValue) ?? .openAI
+        let providerRawValue = UserDefaults.standard.string(forKey: Constants.llmProviderKey) ?? LLMProviderConfig.qwen.rawValue
+        let config = LLMProviderConfig(rawValue: providerRawValue) ?? .qwen
 
         let apiKeyKey = "apikey.\(config.rawValue)"
         guard let apiKey = KeychainService.shared.loadOrNil(key: apiKeyKey), !apiKey.isEmpty else {
