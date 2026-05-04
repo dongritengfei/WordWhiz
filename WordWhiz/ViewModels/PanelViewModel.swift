@@ -262,8 +262,8 @@ final class PanelViewModel {
         // If a specific prompt is selected
         if let prompt = selectedPrompt {
             // Extract system prompt from the stored template
-            // The format is: systemPrompt\n\n用户输入：userPrompt
-            let components = prompt.promptTemplate.components(separatedBy: "\n\n用户输入：")
+            // The format is: systemPrompt\n\n需处理的文本：userPrompt
+            let components = prompt.promptTemplate.components(separatedBy: "\n\n需处理的文本：")
             if components.count == 2 {
                 let systemPrompt = components[0]
                 let userTemplate = components[1]
