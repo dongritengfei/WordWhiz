@@ -22,6 +22,12 @@ if [ ! -d "${APP_PATH}" ]; then
     exit 1
 fi
 
+# 清理旧的 WordWhiz 挂载（避免卷名冲突导致只读挂载）
+echo "=== 清理旧挂载 ==="
+hdiutil info | grep -B1 "WordWhiz" | grep "^/dev/" | awk '{print $1}' | while read -r disk; do
+    hdiutil detach "$disk" -force 2>/dev/null || true
+done
+
 echo "=== 创建临时 DMG ==="
 APP_SIZE=$(du -sm "${APP_PATH}" | cut -f1)
 DMG_SIZE=$((APP_SIZE + 10))
@@ -30,12 +36,11 @@ rm -f "${DMG_NAME}" "${TEMP_DMG}"
 hdiutil create -size "${DMG_SIZE}m" -fs HFS+ -volname "${APP_NAME}" "${TEMP_DMG}"
 
 echo "=== 挂载 DMG ==="
-hdiutil attach "${TEMP_DMG}" -nobrowse
-sleep 1
-
-VOLUME_PATH=$(ls /Volumes | grep "^${APP_NAME}$" | head -1)
+# 直接从 hdiutil attach 输出解析挂载路径（支持空格）
+VOLUME_PATH=$(hdiutil attach "${TEMP_DMG}" -nobrowse | grep "/Volumes/" | sed -E 's|.+ /Volumes/||')
 if [ -z "${VOLUME_PATH}" ]; then
-    VOLUME_PATH=$(ls /Volumes | grep "^${APP_NAME}" | head -1)
+    echo "错误：无法获取挂载路径"
+    exit 1
 fi
 FULL_VOLUME_PATH="/Volumes/${VOLUME_PATH}"
 echo "挂载路径: ${FULL_VOLUME_PATH}"
