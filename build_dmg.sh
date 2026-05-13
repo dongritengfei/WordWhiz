@@ -36,13 +36,12 @@ rm -f "${DMG_NAME}" "${TEMP_DMG}"
 hdiutil create -size "${DMG_SIZE}m" -fs HFS+ -volname "${APP_NAME}" "${TEMP_DMG}"
 
 echo "=== 挂载 DMG ==="
-# 直接从 hdiutil attach 输出解析挂载路径（支持空格）
-VOLUME_PATH=$(hdiutil attach "${TEMP_DMG}" -nobrowse | grep "/Volumes/" | sed -E 's|.+ /Volumes/||')
-if [ -z "${VOLUME_PATH}" ]; then
+# 从 hdiutil attach 输出提取挂载路径（兼容空格卷名）
+FULL_VOLUME_PATH=$(hdiutil attach "${TEMP_DMG}" -nobrowse | awk '/\/Volumes\// {i=index($0,"/Volumes/"); print substr($0,i); exit}')
+if [ -z "${FULL_VOLUME_PATH}" ]; then
     echo "错误：无法获取挂载路径"
     exit 1
 fi
-FULL_VOLUME_PATH="/Volumes/${VOLUME_PATH}"
 echo "挂载路径: ${FULL_VOLUME_PATH}"
 
 echo "=== 复制应用到 DMG ==="
