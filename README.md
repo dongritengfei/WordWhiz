@@ -6,6 +6,8 @@
 ![Language](https://img.shields.io/badge/language-Swift%205.9-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+> **声明**：本项目 100% 的代码均由 AI 生成，未包含任何人工编写的代码。
+
 ## 功能特性
 
 - **全局快捷键触发** - 默认 `⌃Z` 一键唤出优化面板，无需切换应用
@@ -110,7 +112,7 @@ WordWhiz/
 
 ## 贡献
 
-欢迎提交 Issue 和 Pull Request。
+本项目 100% 代码由 AI 生成。欢迎提交 Issue 反馈问题或建议。
 
 ## 许可证
 
