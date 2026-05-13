@@ -2,12 +2,13 @@
 set -e
 
 APP_NAME="WordWhiz"
-APP_PATH="DerivedData/Build/Products/Release/${APP_NAME}.app"
+APP_PATH="DerivedData/Build/Products/Debug/${APP_NAME}.app"
 DMG_NAME="${APP_NAME}.dmg"
 TEMP_DMG="${APP_NAME}_temp.dmg"
+ICON_ICNS="/tmp/WordWhiz.icns"
 
 if [ ! -d "${APP_PATH}" ]; then
-    echo "错误：找不到 Release 构建产物 ${APP_PATH}"
+    echo "错误：找不到构建产物 ${APP_PATH}"
     exit 1
 fi
 
@@ -35,12 +36,29 @@ cp -R "${APP_PATH}" "${FULL_VOLUME_PATH}/"
 echo "=== 创建 Applications 链接 ==="
 ln -s /Applications "${FULL_VOLUME_PATH}/Applications"
 
+echo "=== 设置 DMG 卷图标 ==="
+if [ -f "${ICON_ICNS}" ]; then
+    cp "${ICON_ICNS}" "${FULL_VOLUME_PATH}/.VolumeIcon.icns"
+    SetFile -a C "${FULL_VOLUME_PATH}"
+    echo "图标已设置"
+else
+    echo "警告: 未找到图标文件 ${ICON_ICNS}"
+fi
+
 echo "=== 卸载并压缩 DMG ==="
 hdiutil detach "${FULL_VOLUME_PATH}"
 sleep 1
 
 hdiutil convert "${TEMP_DMG}" -format UDZO -o "${DMG_NAME}"
 rm -f "${TEMP_DMG}"
+
+echo "=== 设置 DMG 文件图标 ==="
+osascript -l JavaScript <<JXAEOF
+ObjC.import('Cocoa');
+var image = $.NSImage.alloc.initWithContentsOfFile('${ICON_ICNS}');
+var ws = $.NSWorkspace.sharedWorkspace;
+ws.setIconForFileOptions(image, '$(pwd)/${DMG_NAME}', 0);
+JXAEOF
 
 echo "=== 完成 ==="
 echo "DMG 文件: $(pwd)/${DMG_NAME}"
