@@ -7,18 +7,31 @@ DMG_NAME="${APP_NAME}.dmg"
 TEMP_DMG="${APP_NAME}_temp.dmg"
 ICON_ICNS="${SCRIPT_DIR}/WordWhiz.icns"
 
-# 默认使用 Release 构建，如果不存在则回退到 Debug
+# 默认使用 Release 构建
 APP_PATH="${SCRIPT_DIR}/DerivedData/Build/Products/Release/${APP_NAME}.app"
-if [ ! -d "${APP_PATH}" ]; then
+if [ ! -d "${APP_PATH}" ] || [ ! -f "${APP_PATH}/Contents/Resources/Assets.car" ]; then
+    echo "=== 执行 Release 构建 ==="
+    xcodebuild -project "${SCRIPT_DIR}/WordWhiz.xcodeproj" -scheme WordWhiz -configuration Release \
+        -derivedDataPath "${SCRIPT_DIR}/DerivedData" build 2>&1 | tail -5
+fi
+
+# 回退到 Debug（仅当 Release 构建失败时）
+if [ ! -d "${APP_PATH}" ] || [ ! -f "${APP_PATH}/Contents/Resources/Assets.car" ]; then
     APP_PATH="${SCRIPT_DIR}/DerivedData/Build/Products/Debug/${APP_NAME}.app"
     if [ -d "${APP_PATH}" ]; then
-        echo "警告: Release 构建不存在，使用 Debug 构建"
+        echo "警告: Release 构建不存在或不完整，使用 Debug 构建"
     fi
 fi
 
 if [ ! -d "${APP_PATH}" ]; then
     echo "错误：找不到构建产物 ${APP_PATH}"
     echo "请先运行: xcodebuild -project WordWhiz.xcodeproj -scheme WordWhiz -configuration Release -derivedDataPath ./DerivedData build"
+    exit 1
+fi
+
+# 验证构建产物包含图标资源
+if [ ! -f "${APP_PATH}/Contents/Resources/Assets.car" ]; then
+    echo "错误：构建产物缺少 Assets.car 图标资源"
     exit 1
 fi
 
