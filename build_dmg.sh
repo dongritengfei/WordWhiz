@@ -2,13 +2,23 @@
 set -e
 
 APP_NAME="WordWhiz"
-APP_PATH="DerivedData/Build/Products/Debug/${APP_NAME}.app"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DMG_NAME="${APP_NAME}.dmg"
 TEMP_DMG="${APP_NAME}_temp.dmg"
-ICON_ICNS="/tmp/WordWhiz.icns"
+ICON_ICNS="${SCRIPT_DIR}/WordWhiz.icns"
+
+# 默认使用 Release 构建，如果不存在则回退到 Debug
+APP_PATH="${SCRIPT_DIR}/DerivedData/Build/Products/Release/${APP_NAME}.app"
+if [ ! -d "${APP_PATH}" ]; then
+    APP_PATH="${SCRIPT_DIR}/DerivedData/Build/Products/Debug/${APP_NAME}.app"
+    if [ -d "${APP_PATH}" ]; then
+        echo "警告: Release 构建不存在，使用 Debug 构建"
+    fi
+fi
 
 if [ ! -d "${APP_PATH}" ]; then
     echo "错误：找不到构建产物 ${APP_PATH}"
+    echo "请先运行: xcodebuild -project WordWhiz.xcodeproj -scheme WordWhiz -configuration Release -derivedDataPath ./DerivedData build"
     exit 1
 fi
 
