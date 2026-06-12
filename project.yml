@@ -47,5 +47,5 @@ targets:
       properties:
         LSUIElement: true
         CFBundleDisplayName: WordWhiz
-        CFBundleShortVersionString: "1.0.0"
+        CFBundleShortVersionString: "0.0.2"
         NSAccessibilityUsageDescription: "WordWhiz needs Accessibility permission to read selected text in other applications and register global keyboard shortcuts."

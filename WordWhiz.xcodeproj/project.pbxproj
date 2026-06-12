@@ -58,6 +58,10 @@
 		E5496C88B5CEE6254058BEA7 /* WordWhizApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13D6C1207EBDF7D685E3C605 /* WordWhizApp.swift */; };
 		EC168CF191FCEF0FE8D4F960 /* HotkeyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEBAFDC73F88105501ED5569 /* HotkeyService.swift */; };
 		FAAF84F579ED4548FD14A6B6 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10FE24479979C90B92CCA0D5 /* MenuBarView.swift */; };
+		AA11BB22CC33DD44EE55BB01 /* GeminiProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF01 /* GeminiProvider.swift */; };
+		AA11BB22CC33DD44EE55BB02 /* KimiProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF02 /* KimiProvider.swift */; };
+		AA11BB22CC33DD44EE55BB03 /* GLMProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF03 /* GLMProvider.swift */; };
+		AA11BB22CC33DD44EE55BB04 /* MiniMaxProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF04 /* MiniMaxProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -114,6 +118,10 @@
 		F21FAFBB66AD05CE683DD9A5 /* ActionBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionBarView.swift; sourceTree = "<group>"; };
 		FEBAFDC73F88105501ED5569 /* HotkeyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyService.swift; sourceTree = "<group>"; };
 		FF2E8B39425B937D3E345A59 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF01 /* GeminiProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiProvider.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF02 /* KimiProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KimiProvider.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF03 /* GLMProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GLMProvider.swift; sourceTree = "<group>"; };
+		AA11BB22CC33DD44EE55FF04 /* MiniMaxProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniMaxProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -177,6 +185,10 @@
 				D96215C0F7528AC1065BA7E4 /* LLMService.swift */,
 				E2A72DF67A0B86C9401E6D17 /* OpenAIProvider.swift */,
 				7124CAB14FF273CC75AAE710 /* QwenProvider.swift */,
+				AA11BB22CC33DD44EE55FF01 /* GeminiProvider.swift */,
+				AA11BB22CC33DD44EE55FF02 /* KimiProvider.swift */,
+				AA11BB22CC33DD44EE55FF03 /* GLMProvider.swift */,
+				AA11BB22CC33DD44EE55FF04 /* MiniMaxProvider.swift */,
 				400A02849CD94F50660CA748 /* SSEParser.swift */,
 			);
 			path = LLM;
@@ -429,6 +441,10 @@
 				2DFD84B95B08A54C2B4EFB56 /* PanelWindowService.swift in Sources */,
 				407978F2C24F659AB075FFEF /* PromptEditorView.swift in Sources */,
 				E3CDFD7B3826E9A05A1FFEB5 /* QwenProvider.swift in Sources */,
+				AA11BB22CC33DD44EE55BB01 /* GeminiProvider.swift in Sources */,
+				AA11BB22CC33DD44EE55BB02 /* KimiProvider.swift in Sources */,
+				AA11BB22CC33DD44EE55BB03 /* GLMProvider.swift in Sources */,
+				AA11BB22CC33DD44EE55BB04 /* MiniMaxProvider.swift in Sources */,
 				782EB481DA59EB8917E65036 /* ResultSectionView.swift in Sources */,
 				BE69C3ACD4C6C07B1779E402 /* SSEParser.swift in Sources */,
 				963807145FDFA83916D0FADD /* SettingsViewModel.swift in Sources */,

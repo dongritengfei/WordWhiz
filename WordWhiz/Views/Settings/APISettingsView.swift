@@ -55,7 +55,7 @@ struct APISettingsView: View {
                 Text("API Base URL")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(BrandColors.textPrimary)
-                Text("自定义 API 端点（留空使用默认地址）")
+                Text("已预填默认地址，可按需修改")
                     .font(.system(size: 11))
                     .foregroundColor(BrandColors.textMuted)
 

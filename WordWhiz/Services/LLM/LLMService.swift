@@ -10,34 +10,40 @@ final class LLMService {
     func createProvider(config: LLMProviderConfig, apiKey: String, baseURL: String?, modelName: String?) -> LLMProviderProtocol? {
         guard !apiKey.isEmpty else { return nil }
 
+        let resolvedModel = (modelName?.isEmpty == false) ? modelName! : config.defaultModel
+        let resolvedURL   = (baseURL?.isEmpty == false) ? baseURL! : config.defaultBaseURL
+
         switch config {
-        case .openAI:
-            return OpenAIProvider(
-                apiKey: apiKey,
-                baseURL: baseURL ?? config.defaultBaseURL,
-                modelName: modelName ?? config.defaultModel
-            )
         case .anthropic:
             return AnthropicProvider(
                 apiKey: apiKey,
-                modelName: modelName ?? config.defaultModel
-            )
-        case .deepSeek:
-            return DeepSeekProvider(
-                apiKey: apiKey,
-                modelName: modelName ?? config.defaultModel
-            )
-        case .qwen:
-            return QwenProvider(
-                apiKey: apiKey,
-                modelName: modelName ?? config.defaultModel
+                modelName: resolvedModel
             )
         case .custom:
-            guard let baseURL, !baseURL.isEmpty else { return nil }
+            guard !resolvedURL.isEmpty else { return nil }
             return OpenAIProvider(
                 apiKey: apiKey,
-                baseURL: baseURL,
-                modelName: modelName ?? "default"
+                baseURL: resolvedURL,
+                modelName: resolvedModel.isEmpty ? "default" : resolvedModel
+            )
+        case .deepSeek:
+            return DeepSeekProvider(apiKey: apiKey, modelName: resolvedModel)
+        case .qwen:
+            return QwenProvider(apiKey: apiKey, modelName: resolvedModel)
+        case .gemini:
+            return GeminiProvider(apiKey: apiKey, modelName: resolvedModel)
+        case .kimi:
+            return KimiProvider(apiKey: apiKey, modelName: resolvedModel)
+        case .glm:
+            return GLMProvider(apiKey: apiKey, modelName: resolvedModel)
+        case .minimax:
+            return MiniMaxProvider(apiKey: apiKey, modelName: resolvedModel)
+        default:
+            // openAI and any future OpenAI-compatible providers
+            return OpenAIProvider(
+                apiKey: apiKey,
+                baseURL: resolvedURL,
+                modelName: resolvedModel
             )
         }
     }

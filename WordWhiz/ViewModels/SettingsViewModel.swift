@@ -155,11 +155,14 @@ final class SettingsViewModel {
     }
 
     func updateDefaultBaseURLAndModel() {
-        if apiBaseURL.isEmpty {
-            apiBaseURL = llmProvider.defaultBaseURL
+        // 始终将默认 URL 和模型填充到字段（让用户看到默认值并可修改）
+        let newURL = llmProvider.defaultBaseURL
+        let newModel = llmProvider.defaultModel
+        if !newURL.isEmpty {
+            apiBaseURL = newURL
         }
-        if modelName.isEmpty {
-            modelName = llmProvider.defaultModel
+        if !newModel.isEmpty {
+            modelName = newModel
         }
     }
 }
