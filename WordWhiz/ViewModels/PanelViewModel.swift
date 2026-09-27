@@ -126,17 +126,23 @@ final class PanelViewModel {
                     userPrompt: userPrompt
                 )
 
+                // Buffer tokens and flush periodically to avoid O(n²) string concatenation
+                var chunks: [String] = []
                 for try await token in stream {
                     guard !Task.isCancelled else { break }
-                    resultText += token
+                    chunks.append(token)
+                    if chunks.count % Constants.streamingFlushInterval == 0 {
+                        resultText = chunks.joined()
+                    }
                 }
+                resultText = chunks.joined()
 
                 if !Task.isCancelled {
                     streamingStatus = .complete
                     // Save to history
                     saveRecord()
-                    // Auto-copy if setting enabled
-                    if UserDefaults.standard.bool(forKey: Constants.autoCopyKey) {
+                    // Auto-copy if setting enabled (default matches SettingsViewModel: true)
+                    if UserDefaults.standard.object(forKey: Constants.autoCopyKey) as? Bool ?? true {
                         ClipboardService.shared.write(resultText)
                     }
                 }
@@ -179,8 +185,9 @@ final class PanelViewModel {
         ClipboardService.shared.write(resultText)
 
         showCopiedFeedback = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            self.showCopiedFeedback = false
+        Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            self?.showCopiedFeedback = false
         }
     }
 
@@ -208,40 +215,7 @@ final class PanelViewModel {
     }
 
     private func seedDefaultPrompts(into modelContext: ModelContext) {
-        let defaults: [(name: String, template: String, sortOrder: Int)] = [
-            (
-                "✨ 润色",
-                "你是一位专业的中文文案编辑。请对用户提供的文本进行润色优化，修正语法错误、改善措辞表达、提升文字质量，但保持原文核心意思不变。输出仅包含优化后的文本，不需要解释修改原因。\n\n需处理的文本：{{text}}",
-                0
-            ),
-            (
-                "🌍 翻译",
-                "你是一位专业的翻译专家。请自动检测源语言：如果原文是中文则翻译为英文，如果原文是英文则翻译为中文。输出仅包含翻译后的文本，不需要解释。\n\n需处理的文本：{{text}}",
-                1
-            ),
-            (
-                "📋 摘要",
-                "你是一位内容摘要专家。请将以下长文本压缩为核心要点，保留关键信息，输出简洁精炼的摘要。输出仅包含摘要文本。\n\n需处理的文本：{{text}}",
-                2
-            ),
-            (
-                "📝 扩写",
-                "你是一位文案扩写专家。请在保持原意的基础上，丰富细节、增加论据、扩展表述，使内容更加充实完整。输出仅包含扩写后的文本。\n\n需处理的文本：{{text}}",
-                3
-            ),
-            (
-                "👔 正式化",
-                "你是一位商务写作专家。请将以下文本转换为正式、规范的书面语，适用于商务邮件、官方文件等场景。保持原意不变，语气正式专业。输出仅包含转换后的文本。\n\n需处理的文本：{{text}}",
-                4
-            ),
-            (
-                "💬 口语化",
-                "你是一位社交媒体文案专家。请将以下文本转换为自然、亲切的口语风格，适用于社交媒体、日常沟通等场景。保持原意不变，语气轻松活泼。输出仅包含转换后的文本。\n\n需处理的文本：{{text}}",
-                5
-            )
-        ]
-
-        for item in defaults {
+        for item in Constants.defaultPrompts {
             let prompt = CustomPrompt(
                 name: item.name,
                 promptTemplate: item.template,
@@ -258,6 +232,8 @@ final class PanelViewModel {
     private func saveRecord() {
         guard let modelContext else { return }
         guard !sourceText.isEmpty, !resultText.isEmpty else { return }
+        // Respect the "保留优化历史" setting (default matches SettingsViewModel: true)
+        guard UserDefaults.standard.object(forKey: Constants.keepHistoryKey) as? Bool ?? true else { return }
 
         let record = OptimizationRecord(
             sourceText: sourceText,
@@ -300,8 +276,8 @@ final class PanelViewModel {
             return nil
         }
 
-        let baseURL = UserDefaults.standard.string(forKey: Constants.apiBaseURLKey)
-        let modelName = UserDefaults.standard.string(forKey: Constants.modelNameKey)
+        let baseURL = UserDefaults.standard.string(forKey: Constants.apiBaseURLKey(provider: config.rawValue))
+        let modelName = UserDefaults.standard.string(forKey: Constants.modelNameKey(provider: config.rawValue))
 
         return LLMService.shared.createProvider(
             config: config,

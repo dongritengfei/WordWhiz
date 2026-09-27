@@ -29,7 +29,7 @@ final class AnthropicProvider: LLMProviderProtocol, @unchecked Sendable {
 
                     let body: [String: Any] = [
                         "model": modelName,
-                        "max_tokens": 2000,
+                        "max_tokens": Constants.maxTokens,
                         "system": systemPrompt,
                         "messages": [
                             ["role": "user", "content": userPrompt]

@@ -60,6 +60,13 @@ private class KeyMonitorNSView: NSView {
     }
 
     private func handleKeyEvent(_ event: NSEvent) -> NSEvent? {
+        // The local monitor receives key events from every window in the app.
+        // Only handle shortcuts for events targeted at this (visible) panel window,
+        // so Esc/⌘R/⌘1-9/⌘⇧C keep working normally in Settings and Onboarding windows.
+        guard let panelWindow = window, panelWindow.isVisible, event.window === panelWindow else {
+            return event
+        }
+
         let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 
         // ESC: hide panel

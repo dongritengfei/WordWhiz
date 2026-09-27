@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct HistorySettingsView: View {
+    @Environment(\.modelContext) private var modelContext
     @State private var historyVM = HistoryViewModel()
     @State private var searchText: String = ""
     @State private var selectedRecord: OptimizationRecord?
@@ -68,15 +69,8 @@ struct HistorySettingsView: View {
         }
         .padding(24)
         .onAppear {
-            if let context = modelContextFromApp {
-                historyVM.setModelContext(context)
-            }
+            historyVM.setModelContext(modelContext)
         }
-    }
-
-    private var modelContextFromApp: ModelContext? {
-        let container = try? ModelContainer(for: OptimizationRecord.self, CustomPrompt.self)
-        return container.flatMap { ModelContext($0) }
     }
 }
 

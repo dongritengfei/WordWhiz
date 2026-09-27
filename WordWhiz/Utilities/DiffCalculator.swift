@@ -13,52 +13,52 @@ enum DiffCalculator {
         let type: DiffType
     }
 
-    /// Line-based diff using a simple LCS-style approach.
+    /// Line-based diff using standard LCS dynamic programming.
     /// Produces segments that show removed, added, and unchanged lines inline.
     static func computeDiff(source: String, result: String) -> [DiffSegment] {
         let sourceLines = source.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
         let resultLines = result.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
 
-        // Build sets for quick lookup
-        let sourceSet = Set(sourceLines)
-        let resultSet = Set(resultLines)
+        let n = sourceLines.count
+        let m = resultLines.count
 
-        var segments: [DiffSegment] = []
-
-        // Track which lines we've already processed
-        var processedSource = Set<Int>()
-        var processedResult = Set<Int>()
-
-        // Walk through both arrays, matching common lines
-        for (sIdx, sLine) in sourceLines.enumerated() {
-            if resultSet.contains(sLine) {
-                // Find matching line in result that hasn't been processed
-                if let rIdx = resultLines.enumerated().first(where: { $0.element == sLine && !processedResult.contains($0.offset) })?.offset {
-                    // First, emit any added lines before this match
-                    for r in processedResult.count..<rIdx where !processedResult.contains(r) {
-                        if !resultLines[r].trimmingCharacters(in: .whitespaces).isEmpty {
-                            segments.append(DiffSegment(text: resultLines[r], type: .added))
-                            processedResult.insert(r)
-                        }
+        // dp[i][j] = length of LCS of sourceLines[i...] and resultLines[j...]
+        var dp = [[Int]](repeating: [Int](repeating: 0, count: m + 1), count: n + 1)
+        if n > 0 && m > 0 {
+            for i in (0..<n).reversed() {
+                for j in (0..<m).reversed() {
+                    if sourceLines[i] == resultLines[j] {
+                        dp[i][j] = dp[i + 1][j + 1] + 1
+                    } else {
+                        dp[i][j] = max(dp[i + 1][j], dp[i][j + 1])
                     }
-                    segments.append(DiffSegment(text: sLine, type: .unchanged))
-                    processedSource.insert(sIdx)
-                    processedResult.insert(rIdx)
-                } else {
-                    segments.append(DiffSegment(text: sLine, type: .removed))
-                    processedSource.insert(sIdx)
                 }
-            } else {
-                segments.append(DiffSegment(text: sLine, type: .removed))
-                processedSource.insert(sIdx)
             }
         }
 
-        // Emit remaining added lines
-        for (rIdx, rLine) in resultLines.enumerated() {
-            if !processedResult.contains(rIdx) && !rLine.trimmingCharacters(in: .whitespaces).isEmpty {
-                segments.append(DiffSegment(text: rLine, type: .added))
+        var segments: [DiffSegment] = []
+        var i = 0
+        var j = 0
+        while i < n && j < m {
+            if sourceLines[i] == resultLines[j] {
+                segments.append(DiffSegment(text: sourceLines[i], type: .unchanged))
+                i += 1
+                j += 1
+            } else if dp[i + 1][j] >= dp[i][j + 1] {
+                segments.append(DiffSegment(text: sourceLines[i], type: .removed))
+                i += 1
+            } else {
+                segments.append(DiffSegment(text: resultLines[j], type: .added))
+                j += 1
             }
+        }
+        while i < n {
+            segments.append(DiffSegment(text: sourceLines[i], type: .removed))
+            i += 1
+        }
+        while j < m {
+            segments.append(DiffSegment(text: resultLines[j], type: .added))
+            j += 1
         }
 
         return segments

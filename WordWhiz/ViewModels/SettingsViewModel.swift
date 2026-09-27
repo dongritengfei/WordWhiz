@@ -46,11 +46,11 @@ final class SettingsViewModel {
     }
 
     var apiBaseURL: String {
-        didSet { UserDefaults.standard.set(apiBaseURL, forKey: Constants.apiBaseURLKey) }
+        didSet { UserDefaults.standard.set(apiBaseURL, forKey: Constants.apiBaseURLKey(provider: llmProvider.rawValue)) }
     }
 
     var modelName: String {
-        didSet { UserDefaults.standard.set(modelName, forKey: Constants.modelNameKey) }
+        didSet { UserDefaults.standard.set(modelName, forKey: Constants.modelNameKey(provider: llmProvider.rawValue)) }
     }
 
     // API Key (not stored in this object — use KeychainService directly)
@@ -99,10 +99,11 @@ final class SettingsViewModel {
         self.panelPosition = PanelPosition(rawValue: posRaw) ?? .screenRight
 
         let providerRaw = UserDefaults.standard.string(forKey: Constants.llmProviderKey) ?? LLMProviderConfig.qwen.rawValue
-        self.llmProvider = LLMProviderConfig(rawValue: providerRaw) ?? .qwen
+        let providerConfig = LLMProviderConfig(rawValue: providerRaw) ?? .qwen
+        self.llmProvider = providerConfig
 
-        self.apiBaseURL = UserDefaults.standard.string(forKey: Constants.apiBaseURLKey) ?? ""
-        self.modelName = UserDefaults.standard.string(forKey: Constants.modelNameKey) ?? ""
+        self.apiBaseURL = UserDefaults.standard.string(forKey: Constants.apiBaseURLKey(provider: providerConfig.rawValue)) ?? ""
+        self.modelName = UserDefaults.standard.string(forKey: Constants.modelNameKey(provider: providerConfig.rawValue)) ?? ""
 
         self.hotkeyEnabled = UserDefaults.standard.object(forKey: Constants.hotkeyEnabledKey) as? Bool ?? true
 
@@ -155,15 +156,11 @@ final class SettingsViewModel {
     }
 
     func updateDefaultBaseURLAndModel() {
-        // 始终将默认 URL 和模型填充到字段（让用户看到默认值并可修改）
-        let newURL = llmProvider.defaultBaseURL
-        let newModel = llmProvider.defaultModel
-        if !newURL.isEmpty {
-            apiBaseURL = newURL
-        }
-        if !newModel.isEmpty {
-            modelName = newModel
-        }
+        // 优先恢复该服务商已保存的配置，否则预填默认值（让用户看到默认值并可修改）
+        apiBaseURL = UserDefaults.standard.string(forKey: Constants.apiBaseURLKey(provider: llmProvider.rawValue))
+            ?? llmProvider.defaultBaseURL
+        modelName = UserDefaults.standard.string(forKey: Constants.modelNameKey(provider: llmProvider.rawValue))
+            ?? llmProvider.defaultModel
     }
 }
 

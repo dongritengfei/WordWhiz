@@ -15,6 +15,8 @@ final class PanelWindowService {
     private let settingsViewModel: SettingsViewModel
     private var deactivateObserver: NSObjectProtocol?
     private var frameObserver: NSKeyValueObservation?
+    /// Token invalidating pending hide-animation completions when the panel is re-shown
+    private var hideAnimationToken = 0
 
     init(panelViewModel: PanelViewModel, settingsViewModel: SettingsViewModel) {
         self.panelViewModel = panelViewModel
@@ -59,8 +61,12 @@ final class PanelWindowService {
         frameObserver?.invalidate()
     }
 
-    func show(sourceText: String) {
+    func show(sourceText: String, autoOptimize: Bool = true) {
         let panel = getOrCreatePanel()
+
+        // Invalidate any in-flight hide animation so its completion doesn't orderOut the panel
+        hideAnimationToken += 1
+        panel.alphaValue = 1
 
         // Update view model with source text
         panelViewModel.sourceText = sourceText
@@ -82,12 +88,16 @@ final class PanelWindowService {
         panel.makeKey()
 
         // Start optimization automatically
-        panelViewModel.optimize()
+        if autoOptimize {
+            panelViewModel.optimize()
+        }
     }
 
     func hide() {
         guard let panel else { return }
 
+        hideAnimationToken += 1
+        let token = hideAnimationToken
         let currentFrame = panel.frame
         let slideOutFrame = NSRect(
             x: currentFrame.origin.x + Constants.slideAnimationOffset,
@@ -101,7 +111,9 @@ final class PanelWindowService {
             context.timingFunction = CAMediaTimingFunction(name: .easeIn)
             panel.animator().setFrame(slideOutFrame, display: true)
             panel.animator().alphaValue = 0
-        }, completionHandler: {
+        }, completionHandler: { [weak self] in
+            // Skip if the panel was re-shown while the animation was running
+            guard let self, token == self.hideAnimationToken else { return }
             panel.orderOut(nil)
             panel.setFrame(currentFrame, display: false)
             panel.alphaValue = 1
@@ -113,8 +125,11 @@ final class PanelWindowService {
     func toggleVisibility(sourceText: String? = nil) {
         if let panel, panel.isVisible {
             hide()
+        } else if let sourceText {
+            show(sourceText: sourceText)
         } else {
-            show(sourceText: sourceText ?? "")
+            // No new text: keep the previous source/result instead of clearing and re-optimizing
+            show(sourceText: panelViewModel.sourceText, autoOptimize: false)
         }
     }
 

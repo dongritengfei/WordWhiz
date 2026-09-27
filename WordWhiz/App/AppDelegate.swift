@@ -38,12 +38,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.accessory)
         NotificationService.shared.requestPermission()
 
-        // Clear stale hotkey config from previous versions with incompatible format
-        if UserDefaults.standard.data(forKey: Constants.hotkeyConfigKey) != nil {
-            UserDefaults.standard.removeObject(forKey: Constants.hotkeyConfigKey)
-        }
-
-
         hotkeyService = HotkeyService()
         panelWindowService = PanelWindowService(
             panelViewModel: panelViewModel,
@@ -123,9 +117,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let textLength = capturedText?.count ?? 0
         NSLog("[WordWhiz] handleHotkeyPressed called with capturedText length: \(textLength)")
         
-        // Use capturedText from clipboard, or show error if empty
+        // Use capturedText from clipboard, or show hint if empty (don't send the hint to the LLM)
         guard let text = capturedText, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            panelWindowService?.show(sourceText: "（剪贴板中没有文本内容，请先复制需要优化的文本）")
+            panelWindowService?.show(sourceText: "（剪贴板中没有文本内容，请先复制需要优化的文本）", autoOptimize: false)
             return
         }
         

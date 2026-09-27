@@ -43,7 +43,7 @@ class OpenAIProvider: LLMProviderProtocol, @unchecked Sendable {
                         ],
                         "stream": true,
                         "temperature": 0.7,
-                        "max_tokens": 2000
+                        "max_tokens": Constants.maxTokens
                     ]
                     request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
