@@ -113,10 +113,7 @@ final class PanelViewModel {
 
         streamingTask = Task {
             do {
-                guard let provider = createCurrentProvider() else {
-                    streamingStatus = .error("请先配置 API Key")
-                    return
-                }
+                let provider = try createCurrentProvider()
 
                 let (systemPrompt, userPrompt) = promptsForCurrentSelection(sourceText: text)
 
@@ -126,16 +123,21 @@ final class PanelViewModel {
                     userPrompt: userPrompt
                 )
 
-                // Buffer tokens and flush periodically to avoid O(n²) string concatenation
-                var chunks: [String] = []
+                // Accumulate tokens in a pending buffer and append to resultText
+                // periodically — repeated full-string joins would be O(n²)
+                var pending = ""
+                var tokensSinceFlush = 0
                 for try await token in stream {
                     guard !Task.isCancelled else { break }
-                    chunks.append(token)
-                    if chunks.count % Constants.streamingFlushInterval == 0 {
-                        resultText = chunks.joined()
+                    pending += token
+                    tokensSinceFlush += 1
+                    if tokensSinceFlush >= Constants.streamingFlushInterval {
+                        resultText += pending
+                        pending = ""
+                        tokensSinceFlush = 0
                     }
                 }
-                resultText = chunks.joined()
+                resultText += pending
 
                 if !Task.isCancelled {
                     streamingStatus = .complete
@@ -148,6 +150,8 @@ final class PanelViewModel {
                 }
             } catch is CancellationError {
                 streamingStatus = .stopped
+            } catch LLMError.apiKeyMissing {
+                streamingStatus = .error("请先配置 API Key")
             } catch {
                 streamingStatus = .error(error.localizedDescription)
             }
@@ -194,9 +198,9 @@ final class PanelViewModel {
     func loadCustomPrompts() {
         guard let modelContext else { return }
 
-        // Seed default prompts on first launch
+        // Seed default prompts on first launch (count avoids fetching all rows)
         let checkDescriptor = FetchDescriptor<CustomPrompt>()
-        if let existing = try? modelContext.fetch(checkDescriptor), existing.isEmpty {
+        if (try? modelContext.fetchCount(checkDescriptor)) == 0 {
             seedDefaultPrompts(into: modelContext)
         }
 
@@ -256,30 +260,33 @@ final class PanelViewModel {
             sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
         )
 
-        guard let allRecords = try? modelContext.fetch(descriptor) else { return }
+        // Count first — skip fetching entirely in the common (no-overflow) case
+        let total = (try? modelContext.fetchCount(descriptor)) ?? 0
+        guard total > maxRecords else { return }
 
-        // If we have more than maxRecords, delete the oldest ones
-        if allRecords.count > maxRecords {
-            let recordsToDelete = allRecords.suffix(from: maxRecords)
-            for record in recordsToDelete {
-                modelContext.delete(record)
-            }
+        // Fetch only the records older than the newest maxRecords
+        var deleteDescriptor = descriptor
+        deleteDescriptor.fetchOffset = maxRecords
+        deleteDescriptor.fetchLimit = total - maxRecords
+        guard let recordsToDelete = try? modelContext.fetch(deleteDescriptor) else { return }
+        for record in recordsToDelete {
+            modelContext.delete(record)
         }
     }
 
-    private func createCurrentProvider() -> LLMProviderProtocol? {
+    private func createCurrentProvider() throws -> LLMProviderProtocol {
         let providerRawValue = UserDefaults.standard.string(forKey: Constants.llmProviderKey) ?? LLMProviderConfig.qwen.rawValue
         let config = LLMProviderConfig(rawValue: providerRawValue) ?? .qwen
 
         let apiKeyKey = "apikey.\(config.rawValue)"
         guard let apiKey = KeychainService.shared.loadOrNil(key: apiKeyKey), !apiKey.isEmpty else {
-            return nil
+            throw LLMError.apiKeyMissing
         }
 
         let baseURL = UserDefaults.standard.string(forKey: Constants.apiBaseURLKey(provider: config.rawValue))
         let modelName = UserDefaults.standard.string(forKey: Constants.modelNameKey(provider: config.rawValue))
 
-        return LLMService.shared.createProvider(
+        return try LLMService.shared.createProvider(
             config: config,
             apiKey: apiKey,
             baseURL: baseURL,
@@ -288,28 +295,26 @@ final class PanelViewModel {
     }
 
     private func promptsForCurrentSelection(sourceText: String) -> (String, String) {
-        // If a specific prompt is selected
-        if let prompt = selectedPrompt {
-            // Extract system prompt from the stored template
-            // The format is: systemPrompt\n\n需处理的文本：userPrompt
-            let components = prompt.promptTemplate.components(separatedBy: "\n\n需处理的文本：")
-            if components.count == 2 {
-                let systemPrompt = components[0]
-                let userTemplate = components[1]
-                let userPrompt = userTemplate.replacingOccurrences(of: "{{text}}", with: sourceText)
-                return (systemPrompt, userPrompt)
-            }
+        // Use the selected prompt, or fall back to the first default template
+        // (single source of truth: Constants.defaultPrompts)
+        let template = selectedPrompt?.promptTemplate ?? Constants.defaultPrompts[0].template
+        return Self.parse(template: template, sourceText: sourceText)
+    }
 
-            // Fallback: use entire template as user prompt
-            let systemPrompt = "你是一位专业的文案助手。请按照以下指令处理文本，输出仅包含处理后的文本。"
-            let userPrompt = prompt.promptTemplate.replacingOccurrences(of: "{{text}}", with: sourceText)
+    private static func parse(template: String, sourceText: String) -> (String, String) {
+        // Extract system prompt from the stored template
+        // The format is: systemPrompt\n\n需处理的文本：userPrompt
+        let components = template.components(separatedBy: "\n\n需处理的文本：")
+        if components.count == 2 {
+            let systemPrompt = components[0]
+            let userTemplate = components[1]
+            let userPrompt = userTemplate.replacingOccurrences(of: "{{text}}", with: sourceText)
             return (systemPrompt, userPrompt)
         }
 
-        // Fallback: use a default prompt
-        return (
-            "你是一位专业的文案编辑。请对用户提供的文本进行润色优化，修正语法错误、改善措辞表达、提升文字质量，但保持原文核心意思不变。输出仅包含优化后的文本，不需要解释修改原因。",
-            sourceText
-        )
+        // Fallback: use entire template as user prompt
+        let systemPrompt = "你是一位专业的文案助手。请按照以下指令处理文本，输出仅包含处理后的文本。"
+        let userPrompt = template.replacingOccurrences(of: "{{text}}", with: sourceText)
+        return (systemPrompt, userPrompt)
     }
 }

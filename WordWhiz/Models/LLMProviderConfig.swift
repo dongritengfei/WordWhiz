@@ -52,12 +52,4 @@ enum LLMProviderConfig: String, CaseIterable, Codable {
         case .custom: return ""
         }
     }
-
-    /// 是否使用 OpenAI 兼容协议（true = 复用 OpenAIProvider）
-    var isOpenAICompatible: Bool {
-        switch self {
-        case .anthropic: return false
-        default: return true
-        }
-    }
 }

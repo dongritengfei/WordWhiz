@@ -1,24 +1,18 @@
 import Foundation
 
 /// OpenAI-compatible chat completions provider with SSE streaming.
-/// Also used as the base for DeepSeek, Qwen, and custom OpenAI-compatible providers.
-class OpenAIProvider: LLMProviderProtocol, @unchecked Sendable {
+/// Used for all OpenAI-compatible providers (OpenAI, DeepSeek, Qwen, Gemini,
+/// Kimi, GLM, MiniMax, and custom endpoints).
+final class OpenAIProvider: LLMProviderProtocol, @unchecked Sendable {
     let apiKey: String
     let baseURL: URL
     let modelName: String
 
-    /// Public failable init for user-provided URLs that may be invalid
+    /// Failable init for URLs that may be invalid
     init?(apiKey: String, baseURL: String, modelName: String) {
         self.apiKey = apiKey
         guard let url = URL(string: baseURL), !baseURL.isEmpty else { return nil }
         self.baseURL = url
-        self.modelName = modelName
-    }
-
-    /// Internal non-failable init for subclasses with known-good URLs
-    init(apiKey: String, baseURLURL: URL, modelName: String) {
-        self.apiKey = apiKey
-        self.baseURL = baseURLURL
         self.modelName = modelName
     }
 
@@ -130,6 +124,7 @@ enum LLMError: LocalizedError {
     case httpError(Int, String)
     case invalidProvider
     case apiKeyMissing
+    case invalidBaseURL(String)
     case cancelled
 
     var errorDescription: String? {
@@ -142,6 +137,8 @@ enum LLMError: LocalizedError {
             return "Invalid LLM provider configuration"
         case .apiKeyMissing:
             return "API Key is not configured"
+        case .invalidBaseURL(let url):
+            return url.isEmpty ? "API Base URL is not configured" : "Invalid API Base URL: \(url)"
         case .cancelled:
             return "Request was cancelled"
         }

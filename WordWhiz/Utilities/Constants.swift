@@ -36,15 +36,18 @@ enum Constants {
     static let keepHistoryKey = "keepHistory"
     static let panelPositionKey = "panelPosition"
     static let llmProviderKey = "llmProvider"
-    static let apiBaseURLKey = "apiBaseURL"
-    static let modelNameKey = "modelName"
     static let panelFrameKey = "panelFrame"
     static let panelPinnedFrameKey = "panelPinnedFrame"
 
+    /// Legacy flat keys from pre-0.0.3 single-provider storage; read once during
+    /// migration (SettingsViewModel.migrateLegacySettings), never written.
+    static let legacyApiBaseURLKey = "apiBaseURL"
+    static let legacyModelNameKey = "modelName"
+
     /// Per-provider Base URL key (URL/model are stored separately for each provider)
-    static func apiBaseURLKey(provider: String) -> String { "\(apiBaseURLKey).\(provider)" }
+    static func apiBaseURLKey(provider: String) -> String { "\(legacyApiBaseURLKey).\(provider)" }
     /// Per-provider model name key
-    static func modelNameKey(provider: String) -> String { "\(modelNameKey).\(provider)" }
+    static func modelNameKey(provider: String) -> String { "\(legacyModelNameKey).\(provider)" }
 
     // Default prompt templates (single source for first-launch seeding)
     static let defaultPrompts: [(name: String, template: String, sortOrder: Int)] = [

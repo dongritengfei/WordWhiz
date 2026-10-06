@@ -102,6 +102,9 @@ final class SettingsViewModel {
         let providerConfig = LLMProviderConfig(rawValue: providerRaw) ?? .qwen
         self.llmProvider = providerConfig
 
+        // One-time migration of pre-0.0.3 flat keys into per-provider storage
+        Self.migrateLegacySettings(providerRawValue: providerConfig.rawValue)
+
         self.apiBaseURL = UserDefaults.standard.string(forKey: Constants.apiBaseURLKey(provider: providerConfig.rawValue)) ?? ""
         self.modelName = UserDefaults.standard.string(forKey: Constants.modelNameKey(provider: providerConfig.rawValue)) ?? ""
 
@@ -113,6 +116,29 @@ final class SettingsViewModel {
 
         // Init complete, enable didSet side effects
         isInitializing = false
+    }
+
+    // MARK: - Migration
+
+    /// Moves values stored under the legacy flat keys (`apiBaseURL`, `modelName`)
+    /// to the per-provider keys of the currently selected provider, then removes
+    /// the legacy entries. No-op for fresh installs.
+    private static func migrateLegacySettings(providerRawValue: String) {
+        let defaults = UserDefaults.standard
+
+        let urlKey = Constants.apiBaseURLKey(provider: providerRawValue)
+        if defaults.string(forKey: urlKey) == nil,
+           let legacyURL = defaults.string(forKey: Constants.legacyApiBaseURLKey) {
+            defaults.set(legacyURL, forKey: urlKey)
+        }
+        defaults.removeObject(forKey: Constants.legacyApiBaseURLKey)
+
+        let modelKey = Constants.modelNameKey(provider: providerRawValue)
+        if defaults.string(forKey: modelKey) == nil,
+           let legacyModel = defaults.string(forKey: Constants.legacyModelNameKey) {
+            defaults.set(legacyModel, forKey: modelKey)
+        }
+        defaults.removeObject(forKey: Constants.legacyModelNameKey)
     }
 
     // MARK: - Actions
@@ -128,23 +154,22 @@ final class SettingsViewModel {
 
         Task {
             do {
-                guard let provider = LLMService.shared.createProvider(
+                let provider = try LLMService.shared.createProvider(
                     config: llmProvider,
                     apiKey: apiKey,
                     baseURL: apiBaseURL.isEmpty ? nil : apiBaseURL,
                     modelName: modelName.isEmpty ? nil : modelName
-                ) else {
-                    await MainActor.run {
-                        isTestingConnection = false
-                        connectionTestResult = .failure("API Key 未配置")
-                    }
-                    return
-                }
+                )
 
                 let success = try await provider.testConnection()
                 await MainActor.run {
                     isTestingConnection = false
                     connectionTestResult = success ? .success : .failure("连接失败")
+                }
+            } catch LLMError.apiKeyMissing {
+                await MainActor.run {
+                    isTestingConnection = false
+                    connectionTestResult = .failure("API Key 未配置")
                 }
             } catch {
                 await MainActor.run {
