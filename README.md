@@ -1,29 +1,40 @@
 # WordWhiz
 
-一款 macOS 原生轻量级文案优化工具，常驻菜单栏，通过全局快捷键一键调用 LLM 大语言模型优化剪贴板文本。
+**macOS 菜单栏里的文案优化助手** —— 复制文本、按下全局快捷键，LLM 立刻开始流式优化，结果一键回填到任何应用。不切窗口、不打断思路。
 
 ![Platform](https://img.shields.io/badge/platform-macOS%2014.0+-blue)
 ![Language](https://img.shields.io/badge/language-Swift%205.9-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+![WordWhiz 优化面板](docs/screenshot.jpg)
+
+*选中「翻译」指令（⌘2）后的实时效果：上方原文、下方流式生成的结果，生成完毕自动进剪贴板。*
+
 > **声明**：本项目 100% 的代码均由 AI 生成，未包含任何人工编写的代码。
 
-## 功能特性
+## ✨ 为什么用 WordWhiz
 
-- **全局快捷键触发** - 默认 `⌃Z` 一键唤出优化面板，无需切换应用
-- **实时流式输出** - LLM 响应逐字呈现，无需等待完整响应
-- **多 LLM 服务商支持** - 支持 OpenAI、Anthropic Claude、DeepSeek、通义千问及自定义 OpenAI 兼容接口（推荐通过阿里云百炼平台使用`kimi-k2.6`，速度最快）
-- **自定义指令** - 内置 6 种默认指令（润色、翻译、摘要、扩写、正式化、口语化），支持自定义 Prompt
-- **历史记录** - 自动保存优化记录，支持搜索和复用
-- **锚定模式** - 面板可锚定在当前位置，拖动后记住自定义位置
-- **安全存储** - API Key 使用 macOS Keychain 加密存储
+- **零打扰常驻** - 默认无 Dock 图标，安静住在菜单栏；需要时一个全局快捷键（默认 `⌃Z`，可自定义 6 种预设）唤出浮动面板
+- **秒级工作流** - `⌘C` 复制 → `⌃Z` 唤出 → 流式出结果 → 直接 `⌘V` 粘贴回原处，全程手不离键盘
+- **6 种内置指令，⌘1-6 瞬切** - 润色 / 翻译 / 摘要 / 扩写 / 正式化 / 口语化；切换即重新优化，也可以在「指令管理」里增删改自己的 Prompt
+- **9 大模型服务开箱即用** - OpenAI、Claude、DeepSeek、通义千问、Gemini、Kimi、智谱 GLM、MiniMax，以及任意 OpenAI 兼容接口；每个服务商的 Base URL、模型名独立保存，一键测试连接
+- **历史可追溯** - 自动保存最近 50 条优化记录，支持关键词搜索、一键复用
+- **隐私优先** - API Key 只存本地 Keychain，历史记录只存本地数据库，文本只发往你自己配置的模型服务
 
-## 系统要求
+## 🚀 安装
 
-- macOS 14.0+
-- Apple Silicon 或 Intel 芯片
+### 下载安装包（推荐）
 
-## 安装
+前往 [Releases](https://github.com/dongritengfei/WordWhiz/releases/latest) 下载对应芯片的 DMG，拖入「应用程序」即可：
+
+| 芯片 | 下载 |
+|------|------|
+| Apple Silicon (M1-M4) | `WordWhiz-v0.0.3-arm64.dmg` |
+| Intel | `WordWhiz-v0.0.3-x86_64.dmg` |
+
+首次启动会弹出引导，选择服务商、粘贴 API Key、测试连接，三步完成配置。
+
+> 应用需要辅助功能权限来注册全局快捷键，请在「系统设置 > 隐私与安全性 > 辅助功能」中授权。
 
 ### 从源码构建
 
@@ -33,41 +44,50 @@ cd WordWhiz
 xcodebuild -project WordWhiz.xcodeproj -scheme WordWhiz -configuration Release build
 ```
 
-构建完成后，应用位于 `build/Build/Products/Release/WordWhiz.app`，将其拖入应用程序文件夹即可。
+构建产物位于 `~/Library/Developer/Xcode/DerivedData/WordWhiz-*/Build/Products/Release/WordWhiz.app`；也可运行 `./build_dmg.sh` 直接打包 DMG。
 
-## 使用说明
+## ⌨️ 使用流程
 
-### 首次配置
-
-1. 启动应用后，在菜单栏点击 WordWhiz 图标
-2. 选择"偏好设置..."
-3. 在"API 配置"页选择 LLM 服务商并填写 API Key
-4. 点击"测试连接"验证配置
-
-### 日常使用
-
-1. **复制文本** - 在任意应用中选中需要优化的文本，按 `⌘ C` 复制
-2. **触发优化** - 按 `⌃Z`（默认快捷键）唤出优化面板
-3. **查看结果** - 面板实时显示优化后的文本，支持直接编辑
-4. **复制使用** - 点击"复制结果"或按 `⌘ ⇧ C`，然后 `⌘ V` 粘贴到目标位置
+1. **复制文本** - 在任意应用中选中文字，`⌘C`
+2. **唤出面板** - 按 `⌃Z`，面板自动读取剪贴板并开始优化
+3. **切换指令** - `⌘1-6` 换指令即时重新生成；`⌘R` 对同一指令重新生成；生成中可随时停止
+4. **取用结果** - 生成完成后结果已自动复制到剪贴板（默认开启，可在设置关闭），直接 `⌘V` 粘贴回目标位置
 
 ### 快捷键
 
 | 快捷键 | 功能 |
 |--------|------|
-| `⌃Z` | 触发优化/显示面板 |
-| `⌘ ⇧ C` | 复制结果 |
+| `⌃Z` | 全局唤出面板 / 触发优化（可在设置中更换） |
+| `⌘ 1-9` | 切换到第 N 条指令并重新优化 |
 | `⌘ R` | 重新生成 |
-| `⌘ 1-9` | 快速切换指令 |
-| `Esc` | 关闭面板 |
-| `⌘ ⇧ ,` | 打开设置 |
+| `Esc` | 隐藏面板 |
 
-## 技术栈
+### 更多设置
 
-- **UI 框架**: SwiftUI
+- **锚定模式** - 面板可钉在当前位置，拖到哪里记在哪里
+- **面板位置** - 屏幕左 / 右 / 居中可选
+- **开机自启**、**Dock 图标显隐**、**优化后自动复制**、**保留历史** 均可开关
+
+## 🤖 支持的模型服务
+
+| 服务商 | 默认模型 |
+|--------|----------|
+| [OpenAI](https://openai.com/) | gpt-4o |
+| [Anthropic Claude](https://www.anthropic.com/) | claude-sonnet-4 |
+| [DeepSeek](https://www.deepseek.com/) | deepseek-chat |
+| [通义千问](https://tongyi.aliyun.com/) | qwen-plus |
+| [Google Gemini](https://ai.google.dev/) | gemini-2.0-flash |
+| [Kimi 月之暗面](https://www.moonshot.cn/) | moonshot-v1-8k |
+| [智谱 GLM](https://open.bigmodel.cn/) | glm-4-flash |
+| [MiniMax](https://www.minimaxi.com/) | MiniMax-Text-01 |
+| 自定义 OpenAI 兼容接口 | 自填 |
+
+## 🛠 技术栈
+
+- **UI 框架**: SwiftUI（浮动 NSPanel 承载）
 - **数据持久化**: SwiftData
 - **全局快捷键**: HotKey (Carbon API)
-- **网络请求**: URLSession + AsyncBytes (SSE 流式响应)
+- **网络请求**: URLSession + AsyncBytes（SSE 流式响应）
 - **安全存储**: Keychain Services
 
 ## 项目结构
@@ -78,37 +98,21 @@ WordWhiz/
 ├── Views/                  # SwiftUI 视图
 │   ├── Panel/             # 优化面板相关视图
 │   ├── Settings/          # 设置窗口视图
+│   ├── Onboarding/        # 首次启动引导
 │   └── MenuBar/           # 菜单栏视图
 ├── ViewModels/            # 视图模型
 ├── Models/                # 数据模型
 ├── Services/              # 业务服务
-│   ├── LLM/              # LLM API 集成
-│   └── ...
+│   └── LLM/              # LLM API 集成（SSE 流式）
 ├── Utilities/             # 工具类和常量
 └── Resources/             # 资源文件
 ```
 
-## 支持的 LLM 服务商
-
-- [OpenAI](https://openai.com/)
-- [Anthropic Claude](https://www.anthropic.com/)
-- [DeepSeek](https://www.deepseek.com/)
-- [通义千问 (Alibaba)](https://tongyi.aliyun.com/)
-- 自定义 OpenAI 兼容接口
-
-## 隐私说明
+## 🔒 隐私说明
 
 - API Key 仅存储在本地 macOS Keychain 中，不会上传到任何服务器
 - 优化历史记录仅保存在本地 SwiftData 数据库
-- 文本优化请求直接发送至用户配置的 LLM 服务商 API
-
-## 开发计划
-
-- [ ] 快捷键绑定到特定指令
-- [ ] 批量优化功能
-- [ ] 本地 LLM 支持 (Ollama)
-- [ ] 浏览器扩展
-- [ ] 原地替换文本 (Accessibility API)
+- 文本优化请求直接发送至用户配置的 LLM 服务商 API，无中间服务器
 
 ## 贡献
 
@@ -117,7 +121,3 @@ WordWhiz/
 ## 许可证
 
 MIT License
-
----
-
-**注意**: 本应用需要 macOS 辅助功能权限以注册全局快捷键。首次使用时系统会弹出权限请求对话框，请在"系统设置 > 隐私与安全性 > 辅助功能"中授权。

@@ -35,30 +35,26 @@ struct ResultSectionView: View {
 
             // Content area
             Group {
-                if viewModel.isShowingDiff {
-                    DiffView()
-                } else {
-                    switch viewModel.streamingStatus {
-                    case .idle:
-                        if viewModel.resultText.isEmpty {
-                            placeholderView
-                        } else {
-                            resultEditor
-                        }
-
-                    case .streaming:
-                        if viewModel.resultText.isEmpty {
-                            StreamingStatusView()
-                        } else {
-                            streamingTextView
-                        }
-
-                    case .complete, .stopped:
+                switch viewModel.streamingStatus {
+                case .idle:
+                    if viewModel.resultText.isEmpty {
+                        placeholderView
+                    } else {
                         resultEditor
-
-                    case .error(let message):
-                        errorView(message)
                     }
+
+                case .streaming:
+                    if viewModel.resultText.isEmpty {
+                        StreamingStatusView()
+                    } else {
+                        streamingTextView
+                    }
+
+                case .complete, .stopped:
+                    resultEditor
+
+                case .error(let message):
+                    errorView(message)
                 }
             }
             .padding(.horizontal, 18)

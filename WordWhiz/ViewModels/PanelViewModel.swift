@@ -53,7 +53,6 @@ final class PanelViewModel {
     var streamingStatus: StreamingStatus = .idle
 
     // UI state
-    var isShowingDiff: Bool = false
     var isSourceCollapsed: Bool = false
     var isPinned: Bool = false
     var showCopiedFeedback: Bool = false
@@ -109,7 +108,6 @@ final class PanelViewModel {
         // Reset state
         resultText = ""
         streamingStatus = .streaming
-        isShowingDiff = false
 
         streamingTask = Task {
             do {

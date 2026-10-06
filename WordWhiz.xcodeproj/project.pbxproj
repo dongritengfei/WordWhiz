@@ -25,7 +25,6 @@
 		43E736BF22FDB906C93A3A6B /* LLMService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D96215C0F7528AC1065BA7E4 /* LLMService.swift */; };
 		46C389DF690775D6948BF244 /* LLMProviderProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7BC6100A6BDD85866241764 /* LLMProviderProtocol.swift */; };
 		4B3841ABA1D5F7A9174D064D /* SourceSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6924599590955BD15E47827A /* SourceSectionView.swift */; };
-		4BE27430B8B0FD9FA43C8A57 /* DiffCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D18D3D9FCCF3F0D19B5133C1 /* DiffCalculator.swift */; };
 		4EFD2467C8A9765DDADCB324 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6ABBC3C79A9AB2FDAB8F25E3 /* Assets.xcassets */; };
 		543B6BCCDCB0734F3E73DAB8 /* HistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4178FAA750E9C6997EA761 /* HistoryViewModel.swift */; };
 		55E147A7EF56E06CE921C0D8 /* OptimizationRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C600B932E5ADE4B82B62043 /* OptimizationRecord.swift */; };
@@ -37,7 +36,6 @@
 		8989CFE2B4E9E8B08C05571F /* APIConfigStepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E208451FCBA258AB7442E3DD /* APIConfigStepView.swift */; };
 		8A07AABE959AB264793AF707 /* OpenAIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2A72DF67A0B86C9401E6D17 /* OpenAIProvider.swift */; };
 		8FA82FABD0B8134E63C2C578 /* CustomPromptsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 140F3FA640BE900D8DA0FADD /* CustomPromptsView.swift */; };
-		90EBFEA83B0561766621015A /* DiffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2191C965EBD8800C30AB6F8 /* DiffView.swift */; };
 		96365B1412E86205612BB000 /* AnthropicProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 157FA3C0365B589F3B8ADFAA /* AnthropicProvider.swift */; };
 		963807145FDFA83916D0FADD /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE6C6211FF2F023BB15FE94 /* SettingsViewModel.swift */; };
 		A538FBBFA2978A914F004E8B /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF2E179725DD6743A4C0C457 /* NotificationService.swift */; };
@@ -90,12 +88,10 @@
 		9B4178FAA750E9C6997EA761 /* HistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewModel.swift; sourceTree = "<group>"; };
 		9C18D160A50668CB7D906BB3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9C600B932E5ADE4B82B62043 /* OptimizationRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptimizationRecord.swift; sourceTree = "<group>"; };
-		A2191C965EBD8800C30AB6F8 /* DiffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffView.swift; sourceTree = "<group>"; };
 		A84B439044C6149E898A60A8 /* CustomPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomPrompt.swift; sourceTree = "<group>"; };
 		AE0FC32AE1A97528CCB84DF0 /* WordWhiz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WordWhiz.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B7BC6100A6BDD85866241764 /* LLMProviderProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMProviderProtocol.swift; sourceTree = "<group>"; };
 		D0A5DFA0851966C74DFD9BC2 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
-		D18D3D9FCCF3F0D19B5133C1 /* DiffCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffCalculator.swift; sourceTree = "<group>"; };
 		D77DFEEAA8A4E7D8DD71082C /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		D96215C0F7528AC1065BA7E4 /* LLMService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMService.swift; sourceTree = "<group>"; };
 		DF2E179725DD6743A4C0C457 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -124,7 +120,6 @@
 			isa = PBXGroup;
 			children = (
 				29EC4F2399D5EE8D80FD51F7 /* Constants.swift */,
-				D18D3D9FCCF3F0D19B5133C1 /* DiffCalculator.swift */,
 				1310939130C37DA592F70F1A /* Extensions */,
 			);
 			path = Utilities;
@@ -205,7 +200,6 @@
 			isa = PBXGroup;
 			children = (
 				F21FAFBB66AD05CE683DD9A5 /* ActionBarView.swift */,
-				A2191C965EBD8800C30AB6F8 /* DiffView.swift */,
 				699047EE83CFED55E095093C /* ModeSelectorView.swift */,
 				77F2A2D1AF4094956E5A2241 /* OptimizationPanelView.swift */,
 				0EC300B8EDA22F406B5491C5 /* PanelHeaderView.swift */,
@@ -390,8 +384,6 @@
 				D64833C4627C2DFCDFEAA730 /* Constants.swift in Sources */,
 				231301788876D38DBA4E378B /* CustomPrompt.swift in Sources */,
 				8FA82FABD0B8134E63C2C578 /* CustomPromptsView.swift in Sources */,
-				4BE27430B8B0FD9FA43C8A57 /* DiffCalculator.swift in Sources */,
-				90EBFEA83B0561766621015A /* DiffView.swift in Sources */,
 				82D961B5B3A6C042C8612603 /* GeneralSettingsView.swift in Sources */,
 				138E1B6E39E9A5C35DF389E9 /* HistorySettingsView.swift in Sources */,
 				543B6BCCDCB0734F3E73DAB8 /* HistoryViewModel.swift in Sources */,
