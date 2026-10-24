@@ -29,8 +29,8 @@
 
 | 芯片 | 下载 |
 |------|------|
-| Apple Silicon (M1-M4) | `WordWhiz-v0.0.3-arm64.dmg` |
-| Intel | `WordWhiz-v0.0.3-x86_64.dmg` |
+| Apple Silicon (M1-M4) | `WordWhiz-v0.0.4-arm64.dmg` |
+| Intel | `WordWhiz-v0.0.4-x86_64.dmg` |
 
 首次启动会弹出引导，选择服务商、粘贴 API Key、测试连接，三步完成配置。
 
